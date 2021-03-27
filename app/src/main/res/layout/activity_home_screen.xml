@@ -57,7 +57,9 @@
             android:textSize="20dp"
             android:paddingHorizontal="40dp"
             android:layout_weight="1"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="10dp"
+            style="?android:attr/borderlessButtonStyle"
+            android:onClick="login"/>
 
     </LinearLayout>
 

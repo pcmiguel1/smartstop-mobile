@@ -3,8 +3,10 @@ package com.example.smartstop;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -75,4 +77,12 @@ public class HomeScreen extends AppCompatActivity {
 
         }
     };
+
+    public void login(View view) {
+
+        Intent intent = new Intent(HomeScreen.this, MapScreen.class);
+        startActivity(intent);
+        finish();
+
+    }
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SmartStop</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoicGNtaWd1ZWwiLCJhIjoiY2toc3lncG1zMGllajJxcGkxYnNjanVieCJ9.yfUra6VpwwsP4dGk9badRA</string>
 </resources>

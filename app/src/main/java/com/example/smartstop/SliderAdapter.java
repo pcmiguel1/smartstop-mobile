@@ -38,9 +38,9 @@ public class SliderAdapter extends PagerAdapter {
 
     public String[] slide_descs = {
 
-            "Mais simples, mais seguro e completo. Sem perder tempo a encontrar um lugar, reserve já o lugar de estacionamento.",
-            "Mais simples, mais seguro e completo. Sem perder tempo a encontrar um lugar, reserve já o lugar de estacionamento.",
-            "Mais simples, mais seguro e completo. Sem perder tempo a encontrar um lugar, reserve já o lugar de estacionamento."
+            "Simpler, safer and complete. Without wasting time find a place, book now parking place.",
+            "Simpler, safer and complete. Without wasting time find a place, book now parking place.",
+            "Simpler, safer and complete. Without wasting time find a place, book now parking place."
 
     };
 
