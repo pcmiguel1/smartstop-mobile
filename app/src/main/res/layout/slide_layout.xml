@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:layout_above="@+id/slide_bottom"
+        android:elevation="2dp">
+
+        <TextView
+            android:id="@+id/slide_heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:text="Parking just got easier"
+            android:textSize="23dp"
+            android:fontFamily="@font/montserratextrabold"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="15dp"
+            />
+
+        <ImageView
+            android:id="@+id/slide_image"
+            android:layout_width="330dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/slide1"
+            android:adjustViewBounds="true"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            />
+
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/slide_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_alignParentBottom="true"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/slide_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mais simples, mais seguro e completo. Sem perder tempo a encontrar um lugar, reserve já o lugar de estacionamento."
+            android:textColor="#B4B4B4"
+            android:textSize="20dp"
+            android:fontFamily="@font/montserratregular"
+            android:textAlignment="center"
+            />
+
+    </RelativeLayout>
+
+</RelativeLayout>
