@@ -7,113 +7,143 @@
     tools:context=".MapScreen"
     android:background="@color/colorAccent">
 
-    <androidx.cardview.widget.CardView
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:elevation="2dp"
+        android:padding="20dp">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_perfil"
+            android:layout_width="62dp"
+            android:layout_height="62dp"
+            android:backgroundTint="@color/colorAccent"
+            mapbox:cardCornerRadius="20dp"
+            android:elevation="1dp"
+            android:layout_alignParentLeft="true">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/icon_perfil"
+                android:layout_gravity="center"/>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_vehicle"
+            android:layout_width="153dp"
+            android:layout_height="62dp"
+            android:elevation="1dp"
+            android:layout_alignParentRight="true"
+            android:backgroundTint="@color/colorAccent"
+            mapbox:cardCornerRadius="20dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="5dp">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/icon_car"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:backgroundTint="@color/colorPrimaryDark"
+                    mapbox:cardCornerRadius="20dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/car_top_view_150px"
+                        android:layout_gravity="center"/>
+
+                </androidx.cardview.widget.CardView>
+
+                <LinearLayout
+                    android:layout_toRightOf="@+id/icon_car"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="5dp"
+                    android:layout_centerVertical="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="My car"
+                        android:textColor="@color/colorGray"
+                        android:textSize="16dp"
+                        android:fontFamily="@font/montserratregular"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A18392"
+                        android:textColor="@android:color/black"
+                        android:textSize="15dp"
+                        android:fontFamily="@font/montserratextrabold"/>
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        mapbox:cardCornerRadius="50dp"
-        android:layout_marginTop="-50dp"
-        android:layout_above="@+id/search_bottom"
-        android:elevation="1dp">
-        
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:elevation="2dp"
-            android:padding="20dp">
-            
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btn_perfil"
-                android:layout_width="62dp"
-                android:layout_height="62dp"
-                android:backgroundTint="@color/colorAccent"
-                mapbox:cardCornerRadius="20dp"
-                android:elevation="1dp"
-                android:layout_alignParentLeft="true">
-                
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/icon_perfil"
-                    android:layout_gravity="center"/>
-                
-            </androidx.cardview.widget.CardView>
+        android:layout_above="@+id/search_bottom">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btn_vehicle"
-                android:layout_width="153dp"
-                android:layout_height="62dp"
-                android:elevation="1dp"
-                android:layout_alignParentRight="true"
-                android:backgroundTint="@color/colorAccent"
-                mapbox:cardCornerRadius="20dp">
-                
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingHorizontal="5dp">
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/icon_car"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:backgroundTint="@color/colorPrimaryDark"
-                        mapbox:cardCornerRadius="20dp"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true">
-                        
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:src="@drawable/car_top_view_150px"
-                            android:layout_gravity="center"/>
-                        
-                    </androidx.cardview.widget.CardView>
-
-                    <LinearLayout
-                        android:layout_toRightOf="@+id/icon_car"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginLeft="5dp"
-                        android:layout_centerVertical="true">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="My car"
-                            android:textColor="@color/colorGray"
-                            android:textSize="16dp"
-                            android:fontFamily="@font/montserratregular"
-                            />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="A18392"
-                            android:textColor="@android:color/black"
-                            android:textSize="15dp"
-                            android:fontFamily="@font/montserratextrabold"/>
-
-                    </LinearLayout>
-                    
-                    
-                </RelativeLayout>
-                
-            </androidx.cardview.widget.CardView>
-            
-        </RelativeLayout>
-
-        <com.mapbox.mapboxsdk.maps.MapView
-            android:id="@+id/mapView"
-            android:layout_marginBottom="-40dp"
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            mapbox:mapbox_cameraTargetLat="38.722098"
-            mapbox:mapbox_cameraTargetLng="-9.1212317"
-            mapbox:mapbox_cameraZoom="11"/>
+            mapbox:cardCornerRadius="50dp"
+            android:layout_marginTop="-50dp"
+            android:elevation="1dp">
 
-    </androidx.cardview.widget.CardView>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:elevation="2dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:backgroundTint="@color/colorAccent"
+                    android:padding="10dp"
+                    mapbox:cardCornerRadius="20dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/near_me_150px"
+                        android:layout_gravity="center"/>
+
+                </androidx.cardview.widget.CardView>
+
+            </RelativeLayout>
+
+            <com.mapbox.mapboxsdk.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                mapbox:mapbox_cameraTargetLat="38.722098"
+                mapbox:mapbox_cameraTargetLng="-9.1212317"
+                mapbox:mapbox_cameraZoom="11"/>
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/search_bottom"
