@@ -4,8 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -188,6 +192,17 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                                 symbol.setTextFont(new String[] {"Montserrat ExtraBold"});
                                 symbol.setTextSize(29f);
                                 symbolManager.update(symbol);
+
+                                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                                        MapScreen.this, R.style.BottomSheetDialogTheme
+                                );
+                                View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                                        .inflate(
+                                                R.layout.layout_bottom_sheet_park_info,
+                                                (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
+                                        );
+                                bottomSheetDialog.setContentView(bottomSheetView);
+                                bottomSheetDialog.show();
                                 return true;
                             }
                         });

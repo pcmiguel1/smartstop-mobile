@@ -37,6 +37,10 @@ dependencies {
 
     implementation 'androidx.cardview:cardview:1.0.0'
 
+    implementation 'com.google.android.material:material:1.4.0-alpha01'
+
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+
     //Mapbox dependencies
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.2.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-telemetry:6.1.0'

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomSheetParkInfo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_background"
+    android:orientation="vertical">
+    
+    <androidx.cardview.widget.CardView
+        android:layout_width="45dp"
+        android:layout_height="5dp"
+        android:backgroundTint="#D2D2D2"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="20dp"
+        android:layout_gravity="center_horizontal"
+        app:cardElevation="0dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="top"
+            android:layout_marginRight="30dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lisboa - Castil"
+                android:textColor="#000"
+                android:fontFamily="@font/montserratextrabold"
+                android:textSize="25dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rua Castilho, 1250-048"
+                android:textColor="@color/colorGray"
+                android:textSize="15dp"
+                android:fontFamily="@font/montserratregular"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+                
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical">
+                    
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        app:cardCornerRadius="5dp"
+                        android:backgroundTint="@color/colorPrimaryDark">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="P"
+                            android:fontFamily="@font/montserratextrabold"
+                            android:textSize="13dp"
+                            android:textColor="@color/colorAccent"
+                            android:layout_gravity="center"/>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="24 spots"
+                        android:fontFamily="@font/montserratregular"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="13dp"
+                        android:layout_marginLeft="5dp" />
+                    
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="10dp">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        app:cardCornerRadius="5dp"
+                        android:backgroundTint="@color/colorPrimaryDark">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="€"
+                            android:fontFamily="@font/montserratextrabold"
+                            android:textSize="13dp"
+                            android:textColor="@color/colorAccent"
+                            android:layout_gravity="center"/>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="6.50/h"
+                        android:fontFamily="@font/montserratregular"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="13dp"
+                        android:layout_marginLeft="5dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/park"
+            app:riv_corner_radius="10dp" />
+        
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:layout_marginBottom="20dp">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:text="Book Spot"
+            android:textColor="@color/colorAccent"
+            android:textAllCaps="false"
+            android:fontFamily="@font/montserratregular"
+            android:textSize="20dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Working hours"
+            android:textColor="@color/colorGray"
+            android:textSize="15dp"
+            android:fontFamily="@font/montserratregular"
+            android:layout_marginTop="20dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="05:00 - 23:00"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"
+            android:fontFamily="@font/montserratregular"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Now is open"
+            android:textColor="#4EB84A"
+            android:textSize="15dp"
+            android:fontFamily="@font/montserratregular"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Contacts"
+            android:textColor="@color/colorGray"
+            android:textSize="15dp"
+            android:fontFamily="@font/montserratregular"
+            android:layout_marginTop="20dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/phone_150px"/>
+
+            <TextView
+                android:layout_marginLeft="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="886-386-900"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="18dp"
+                android:fontFamily="@font/montserratregular"
+                />
+            
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Full address"
+            android:textColor="@color/colorGray"
+            android:textSize="15dp"
+            android:fontFamily="@font/montserratregular"
+            android:layout_marginTop="20dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rua Castilho, ..."
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"
+            android:fontFamily="@font/montserratregular"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>
