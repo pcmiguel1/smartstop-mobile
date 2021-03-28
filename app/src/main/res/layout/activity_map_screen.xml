@@ -21,7 +21,9 @@
             android:backgroundTint="@color/colorAccent"
             mapbox:cardCornerRadius="20dp"
             android:elevation="1dp"
-            android:layout_alignParentLeft="true">
+            android:layout_alignParentLeft="true"
+            mapbox:cardElevation="0dp"
+            android:onClick="openPerfil">
 
             <ImageView
                 android:layout_width="30dp"
@@ -38,7 +40,8 @@
             android:elevation="1dp"
             android:layout_alignParentRight="true"
             android:backgroundTint="@color/colorAccent"
-            mapbox:cardCornerRadius="20dp">
+            mapbox:cardCornerRadius="20dp"
+            mapbox:cardElevation="0dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -99,14 +102,16 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/search_bottom">
+        android:layout_above="@+id/search_bottom"
+        android:elevation="1dp">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             mapbox:cardCornerRadius="50dp"
             android:layout_marginTop="-50dp"
-            android:elevation="1dp">
+            android:elevation="1dp"
+            mapbox:cardElevation="0dp">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -121,7 +126,8 @@
                     android:padding="10dp"
                     mapbox:cardCornerRadius="20dp"
                     android:layout_alignParentBottom="true"
-                    android:layout_alignParentRight="true">
+                    android:layout_alignParentRight="true"
+                    mapbox:cardElevation="0dp">
 
                     <ImageView
                         android:layout_width="25dp"

@@ -3,6 +3,7 @@ package com.example.smartstop;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -208,5 +209,12 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                         });
                     }
                 });
+    }
+
+    public void openPerfil(View view) {
+
+        Intent intent = new Intent(MapScreen.this, PerfilScreen.class);
+        startActivity(intent);
+
     }
 }
