@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PerfilScreen"></activity>
+        <activity android:name=".LoginScreen"></activity>
+        <activity android:name=".PerfilScreen" />
         <activity android:name=".HomeScreen" />
         <activity android:name=".MapScreen" />
         <activity android:name=".MainActivity">

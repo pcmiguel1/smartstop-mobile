@@ -78,11 +78,10 @@ public class HomeScreen extends AppCompatActivity {
         }
     };
 
-    public void login(View view) {
+    public void openLogin(View view) {
 
-        Intent intent = new Intent(HomeScreen.this, MapScreen.class);
+        Intent intent = new Intent(HomeScreen.this, LoginScreen.class);
         startActivity(intent);
-        finish();
 
     }
 }
