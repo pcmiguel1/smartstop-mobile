@@ -194,21 +194,54 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                                 symbol.setTextSize(29f);
                                 symbolManager.update(symbol);
 
-                                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
-                                        MapScreen.this, R.style.BottomSheetDialogTheme
-                                );
-                                View bottomSheetView = LayoutInflater.from(getApplicationContext())
-                                        .inflate(
-                                                R.layout.layout_bottom_sheet_park_info,
-                                                (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
-                                        );
-                                bottomSheetDialog.setContentView(bottomSheetView);
-                                bottomSheetDialog.show();
+                                openParkInfo();
+
                                 return true;
                             }
                         });
                     }
                 });
+    }
+
+    private void openParkInfo() {
+
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                MapScreen.this, R.style.BottomSheetDialogTheme
+        );
+        View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                .inflate(
+                        R.layout.layout_bottom_sheet_park_info,
+                        (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
+                );
+
+        bottomSheetView.findViewById(R.id.btn_openBookDetails).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetDialog.dismiss();
+                openBookDetails();
+            }
+        });
+
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+
+    }
+
+    private void openBookDetails() {
+
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                MapScreen.this, R.style.BottomSheetDialogTheme
+        );
+        View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                .inflate(
+                        R.layout.layout_bottom_sheet_book_info,
+                        (LinearLayout) findViewById(R.id.bottomSheetBookDetails)
+                );
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+
     }
 
     public void openPerfil(View view) {
