@@ -84,4 +84,10 @@ public class HomeScreen extends AppCompatActivity {
         startActivity(intent);
 
     }
+
+    public void openRegister(View view) {
+
+        Intent intent = new Intent(HomeScreen.this, RegisterScreen.class);
+        startActivity(intent);
+    }
 }

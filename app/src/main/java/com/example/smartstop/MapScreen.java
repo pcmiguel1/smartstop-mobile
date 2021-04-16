@@ -250,4 +250,9 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         startActivity(intent);
 
     }
+
+    public void openVehicles(View view) {
+        Intent intent = new Intent(MapScreen.this, VehiclesScreen.class);
+        startActivity(intent);
+    }
 }

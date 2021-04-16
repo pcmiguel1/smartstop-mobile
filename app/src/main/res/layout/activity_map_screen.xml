@@ -41,7 +41,8 @@
             android:layout_alignParentRight="true"
             android:backgroundTint="@color/colorAccent"
             mapbox:cardCornerRadius="20dp"
-            mapbox:cardElevation="0dp">
+            mapbox:cardElevation="0dp"
+            android:onClick="openVehicles">
 
             <RelativeLayout
                 android:layout_width="match_parent"
