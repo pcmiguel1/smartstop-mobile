@@ -96,6 +96,7 @@
                         android:text="Full Name"/>
 
                     <EditText
+                        android:id="@+id/input_fullname"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null"
@@ -146,6 +147,7 @@
                         android:text="Email Address"/>
 
                     <EditText
+                        android:id="@+id/input_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null"
@@ -196,6 +198,7 @@
                         android:text="Password"/>
 
                     <EditText
+                        android:id="@+id/input_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null"
@@ -247,6 +250,7 @@
                         android:text="Confirm Password"/>
 
                     <EditText
+                        android:id="@+id/input_confirmPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null"
@@ -292,7 +296,7 @@
             android:layout_marginTop="40dp">
 
             <ProgressBar
-                android:id="@+id/progressLogin"
+                android:id="@+id/progressRegister"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:indeterminate="true"
