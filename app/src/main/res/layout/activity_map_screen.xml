@@ -128,7 +128,8 @@
                     mapbox:cardCornerRadius="20dp"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
-                    mapbox:cardElevation="0dp">
+                    mapbox:cardElevation="0dp"
+                    android:onClick="myLocation">
 
                     <ImageView
                         android:layout_width="25dp"

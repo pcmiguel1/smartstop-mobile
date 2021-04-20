@@ -1,16 +1,19 @@
 package com.example.smartstop;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.PointF;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.BounceInterpolator;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -24,15 +27,23 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineCallback;
+import com.mapbox.android.core.location.LocationEngineProvider;
+import com.mapbox.android.core.location.LocationEngineRequest;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
+import com.mapbox.mapboxsdk.location.LocationComponentOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -43,6 +54,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +74,14 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
     private LocationRequest locationRequest;
     public static final int REQUEST_CHECK_SETTING = 1001;
+
+    private LocationEngine locationEngine;
+    private long DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L;
+    private long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
+    private LatLng userLocation;
+
+    // Variables needed to listen to location updates
+    private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,16 +207,27 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     }
 
     @SuppressWarnings( {"MissingPermission"})
-    private void enableLocationComponent(@NonNull Style loadedMapStyle) {
+    private void enableLocationComponent(@NonNull Style style) {
         // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
 
-            // Get an instance of the component
-            LocationComponent locationComponent = mapboxMap.getLocationComponent();
+            LocationComponentOptions locationComponentOptions =
+                    LocationComponentOptions.builder(this)
+                            .pulseEnabled(true)
+                            .pulseColor(getResources().getColor(R.color.colorPrimary))
+                            .pulseAlpha(.4f)
+                            .pulseInterpolator(new BounceInterpolator())
+                            .build();
 
             // Activate with options
-            locationComponent.activateLocationComponent(
-                    LocationComponentActivationOptions.builder(this, loadedMapStyle).build());
+            LocationComponentActivationOptions locationComponentActivationOptions = LocationComponentActivationOptions
+                    .builder(this, style)
+                    .locationComponentOptions(locationComponentOptions)
+                    .build();
+
+            // Get an instance of the component
+            LocationComponent locationComponent = mapboxMap.getLocationComponent();
+            locationComponent.activateLocationComponent(locationComponentActivationOptions);
 
             // Enable to make component visible
             locationComponent.setLocationComponentEnabled(true);
@@ -207,10 +238,28 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             // Set the component's render mode
             locationComponent.setRenderMode(RenderMode.COMPASS);
 
+            initLocationEngine();
+
+
         } else {
             permissionsManager = new PermissionsManager(this);
             permissionsManager.requestLocationPermissions(this);
         }
+    }
+
+    /**
+     * Set up the LocationEngine and the parameters for querying the device's location
+     */
+    @SuppressLint("MissingPermission")
+    private void initLocationEngine() {
+        locationEngine = LocationEngineProvider.getBestLocationEngine(this);
+
+        LocationEngineRequest request = new LocationEngineRequest.Builder(DEFAULT_INTERVAL_IN_MILLISECONDS)
+                .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+                .setMaxWaitTime(DEFAULT_MAX_WAIT_TIME).build();
+
+        locationEngine.requestLocationUpdates(request, callback, getMainLooper());
+        locationEngine.getLastLocation(callback);
     }
 
     @Override
@@ -235,6 +284,58 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         } else {
             Toast.makeText(this, "Please give location permissions!", Toast.LENGTH_LONG).show();
             finish();
+        }
+    }
+
+    private static class MainActivityLocationCallback
+            implements LocationEngineCallback<LocationEngineResult> {
+
+        private final WeakReference<MapScreen> activityWeakReference;
+
+        MainActivityLocationCallback(MapScreen activity) {
+            this.activityWeakReference = new WeakReference<>(activity);
+        }
+
+        /**
+         * The LocationEngineCallback interface's method which fires when the device's location has changed.
+         *
+         * @param result the LocationEngineResult object which has the last known location within it.
+         */
+        @Override
+        public void onSuccess(LocationEngineResult result) {
+            MapScreen activity = activityWeakReference.get();
+
+            if (activity != null) {
+                Location location = result.getLastLocation();
+
+                if (location == null) {
+                    return;
+                }
+
+                // save the user location
+                if (result != null) {
+                    activity.userLocation = new LatLng(result.getLastLocation().getLatitude(), result.getLastLocation().getLongitude());
+                }
+
+                // Pass the new location to the Maps SDK's LocationComponent
+                if (activity.mapboxMap != null && result.getLastLocation() != null) {
+                    activity.mapboxMap.getLocationComponent().forceLocationUpdate(result.getLastLocation());
+                }
+            }
+        }
+
+        /**
+         * The LocationEngineCallback interface's method which fires when the device's location can not be captured
+         *
+         * @param exception the exception message
+         */
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+            MapScreen activity = activityWeakReference.get();
+            if (activity != null) {
+                Toast.makeText(activity, exception.getLocalizedMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -376,6 +477,24 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         if (mapboxMap != null) {
             mapboxMap.removeOnMapClickListener(this);
         }
+        // Prevent leaks
+        if (locationEngine != null) {
+            locationEngine.removeLocationUpdates(callback);
+        }
         mapView.onDestroy();
+    }
+
+    public void myLocation(View view) {
+
+        if (userLocation != null) {
+
+            CameraPosition pos = new CameraPosition.Builder()
+                    .target(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
+                    .build();
+
+            mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
+
+        }
+
     }
 }
