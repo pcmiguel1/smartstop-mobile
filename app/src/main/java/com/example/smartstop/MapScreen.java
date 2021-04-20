@@ -34,8 +34,13 @@ import com.mapbox.android.core.location.LocationEngineRequest;
 import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.api.directions.v5.DirectionsCriteria;
+import com.mapbox.api.directions.v5.MapboxDirections;
+import com.mapbox.api.directions.v5.models.DirectionsResponse;
+import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -50,6 +55,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -58,7 +65,16 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.mapbox.core.constants.Constants.PRECISION_6;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineCap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineJoin;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textFont;
@@ -79,6 +95,11 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private long DEFAULT_INTERVAL_IN_MILLISECONDS = 1000L;
     private long DEFAULT_MAX_WAIT_TIME = DEFAULT_INTERVAL_IN_MILLISECONDS * 5;
     private LatLng userLocation;
+
+    private static final String ROUTE_LAYER_ID = "route-layer-id";
+    private static final String ROUTE_SOURCE_ID = "route-source-id";
+    private DirectionsRoute currentRoute;
+    private MapboxDirections client;
 
     // Variables needed to listen to location updates
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
@@ -157,6 +178,10 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                         mapboxMap.addOnMapClickListener(MapScreen.this);
 
+                        initSource(style);
+
+                        initLayers(style);
+
                     }
                 });
     }
@@ -199,6 +224,13 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             if (features.size() > 0) {
                 markerSelected = true;
                 openParkInfo();
+
+                //Calcular rota até ao destino
+                Point origin = Point.fromLngLat(userLocation.getLongitude(), userLocation.getLatitude());
+                Point destination = Point.fromLngLat(point.getLongitude(), point.getLatitude());
+                System.out.println("PointO: " + origin);
+                System.out.println("PointD: " + destination);
+                getRoute(mapboxMap, origin, destination);
             }
 
         }
@@ -405,6 +437,90 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             }
         });
 
+    }
+
+    /**
+     * Add the route and marker sources to the map
+     */
+    private void initSource(@NonNull Style loadedMapStyle) {
+        loadedMapStyle.addSource(new GeoJsonSource(ROUTE_SOURCE_ID));
+    }
+
+    /**
+     * Add the route and marker icon layers to the map
+     */
+    private void initLayers(@NonNull Style loadedMapStyle) {
+        LineLayer routeLayer = new LineLayer(ROUTE_LAYER_ID, ROUTE_SOURCE_ID);
+
+        // Add the LineLayer to the map. This layer will display the directions route.
+        routeLayer.setProperties(
+                lineCap(Property.LINE_CAP_ROUND),
+                lineJoin(Property.LINE_JOIN_ROUND),
+                lineWidth(5f),
+                lineColor(getResources().getColor(R.color.colorPrimary))
+        );
+        loadedMapStyle.addLayer(routeLayer);
+    }
+
+    /**
+     * Make a request to the Mapbox Directions API. Once successful, pass the route to the
+     * route layer.
+     * @param mapboxMap the Mapbox map object that the route will be drawn on
+     * @param origin      the starting point of the route
+     * @param destination the desired finish point of the route
+     */
+    private void getRoute(MapboxMap mapboxMap, Point origin, Point destination) {
+        client = MapboxDirections.builder()
+                .origin(origin)
+                .destination(destination)
+                .overview(DirectionsCriteria.OVERVIEW_FULL)
+                .profile(DirectionsCriteria.PROFILE_DRIVING)
+                .accessToken(getString(R.string.mapbox_access_token))
+                .build();
+
+        client.enqueueCall(new Callback<DirectionsResponse>() {
+            @Override
+            public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+                // You can get the generic HTTP info about the response
+                if (response.body() == null) {
+                    return;
+                } else if (response.body().routes().size() < 1) {
+                    return;
+                }
+
+                // Get the directions route
+                currentRoute = response.body().routes().get(0);
+                System.out.println("Route: " + currentRoute);
+
+                // Make a toast which displays the route's distance
+                /*Toast.makeText(MapScreen.this, String.format(
+                        "Distancia ",
+                        currentRoute.distance()), Toast.LENGTH_SHORT).show();*/
+
+                if (mapboxMap != null) {
+                    mapboxMap.getStyle(new Style.OnStyleLoaded() {
+                        @Override
+                        public void onStyleLoaded(@NonNull Style style) {
+
+                            // Retrieve and update the source designated for showing the directions route
+                            GeoJsonSource source = style.getSourceAs(ROUTE_SOURCE_ID);
+
+                            // Create a LineString with the directions route's geometry and
+                            // reset the GeoJSON source for the route LineLayer source
+                            if (source != null) {
+                                source.setGeoJson(LineString.fromPolyline(currentRoute.geometry(), PRECISION_6));
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
+                Toast.makeText(MapScreen.this, "Error: " + throwable.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void openBookDetails() {
