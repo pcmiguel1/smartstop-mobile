@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.BitmapFactory;
@@ -14,8 +16,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -33,7 +37,6 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.gson.JsonObject;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -47,7 +50,6 @@ import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
-import com.mapbox.geojson.Geometry;
 import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -75,9 +77,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -546,7 +548,19 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             @Override
             public void onClick(View v) {
                 bottomSheetDialog.dismiss();
-                openBookDetails();
+
+                //Enviar as informações do parque para o outro dialog
+                JSONObject info = new JSONObject();
+                try {
+                    info.put("name", name.getText().toString());
+                    info.put("spots", total_spots.getText().toString());
+                    info.put("address", address.getText().toString());
+                    info.put("price", price.getText().toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                openBookDetails(info);
             }
         });
 
@@ -671,7 +685,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         });
     }
 
-    private void openBookDetails() {
+    private void openBookDetails(JSONObject info) {
 
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
                 MapScreen.this, R.style.BottomSheetDialogTheme
@@ -681,6 +695,45 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                         R.layout.layout_bottom_sheet_book_info,
                         (LinearLayout) findViewById(R.id.bottomSheetBookDetails)
                 );
+
+        TextView startDate, startHour, d, price, p_name, p_address, p_spots, p_price;
+
+        startDate = bottomSheetView.findViewById(R.id.start_date);
+        startHour = bottomSheetView.findViewById(R.id.start_hour);
+        d = bottomSheetView.findViewById(R.id.duration);
+        price = bottomSheetView.findViewById(R.id.total_price);
+
+        p_name = bottomSheetView.findViewById(R.id.park_name);
+        p_address = bottomSheetView.findViewById(R.id.park_address);
+        p_spots = bottomSheetView.findViewById(R.id.park_totalSpots);
+        p_price = bottomSheetView.findViewById(R.id.park_price);
+
+        try {
+            p_name.setText(info.getString("name"));
+            p_address.setText(info.getString("address"));
+            p_spots.setText(info.getString("spots"));
+            p_price.setText(info.getString("price"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        bottomSheetView.findViewById(R.id.btn_start_day).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                showStartDayDialog(startDate, startHour);
+
+            }
+        });
+
+        bottomSheetView.findViewById(R.id.btn_duration).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                showDurationDialog(d, price, p_price);
+
+            }
+        });
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
@@ -754,11 +807,81 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
             CameraPosition pos = new CameraPosition.Builder()
                     .target(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))
+                    .zoom(10)
                     .build();
 
             mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
 
         }
+
+    }
+
+    private void showDurationDialog(final TextView hour, final TextView price, final  TextView p) {
+
+        final Calendar calendar = Calendar.getInstance();
+
+        TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                calendar.set(Calendar.MINUTE, minute);
+
+                hour.setText(calendar.get(Calendar.HOUR_OF_DAY)+"h " + calendar.get(Calendar.MINUTE)+"m");
+
+
+                //Calcular o preço de acordo com o valor por hora e a duração
+                String hourPrice = p.getText().toString().replace("/h", "");
+                double hourPriceDouble = Double.parseDouble(hourPrice);
+                double dateToHour = calendar.get(Calendar.HOUR_OF_DAY) + (calendar.get(Calendar.MINUTE) / 60.0);
+
+                double total = (dateToHour * hourPriceDouble);
+
+                price.setText("Pay €"+ String.format("%.2f", total).replace(",", "."));
+
+
+            }
+        };
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(MapScreen.this, timeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE),true);
+        timePickerDialog.show();
+
+
+    }
+
+    private void showStartDayDialog(final TextView date, final TextView hour) {
+
+        final Calendar calendar = Calendar.getInstance();
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                date.setText(simpleDateFormat.format(calendar.getTime()));
+
+                TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+
+                        SimpleDateFormat simpleHourFormat = new SimpleDateFormat("HH:mm");
+                        hour.setText(simpleHourFormat.format(calendar.getTime()));
+
+                    }
+                };
+
+                new TimePickerDialog(MapScreen.this, timeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE),true).show();
+
+            }
+        };
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(MapScreen.this, dateSetListener, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
+        DatePicker datePicker = datePickerDialog.getDatePicker();
+        datePicker.setMinDate(calendar.getTimeInMillis() + (1000 * 60 * 60 * 24));
+        datePickerDialog.show();
 
     }
 }

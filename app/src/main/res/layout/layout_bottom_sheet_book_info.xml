@@ -32,6 +32,7 @@
             android:layout_marginRight="30dp">
 
             <TextView
+                android:id="@+id/park_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Lisboa - Castil"
@@ -40,6 +41,7 @@
                 android:textSize="25dp"/>
 
             <TextView
+                android:id="@+id/park_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Rua Castilho, 1250-048"
@@ -78,6 +80,7 @@
                     </androidx.cardview.widget.CardView>
 
                     <TextView
+                        android:id="@+id/park_totalSpots"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="24 spots"
@@ -113,6 +116,7 @@
                     </androidx.cardview.widget.CardView>
 
                     <TextView
+                        android:id="@+id/park_price"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="6.50/h"
@@ -144,6 +148,7 @@
         android:layout_marginBottom="10dp">
         
         <RelativeLayout
+            android:id="@+id/btn_duration"
             android:layout_width="100dp"
             android:layout_height="110dp">
 
@@ -168,9 +173,9 @@
                 </androidx.cardview.widget.CardView>
 
                 <TextView
+                    android:id="@+id/duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="5h 30m"
                     android:textColor="@color/colorPrimaryDark"
                     android:fontFamily="@font/montserratsemibold"
                     android:textSize="15dp"
@@ -191,6 +196,7 @@
             
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/btn_start_day"
             android:layout_width="100dp"
             android:layout_height="110dp"
             android:layout_marginLeft="50dp">
@@ -216,9 +222,9 @@
                 </androidx.cardview.widget.CardView>
 
                 <TextView
+                    android:id="@+id/start_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="27-03-2021"
                     android:textColor="@color/colorPrimaryDark"
                     android:fontFamily="@font/montserratsemibold"
                     android:textSize="15dp"
@@ -226,9 +232,9 @@
                     />
 
                 <TextView
+                    android:id="@+id/start_hour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="8:00"
                     android:textColor="@color/colorPrimaryDark"
                     android:fontFamily="@font/montserratregular"
                     android:textSize="8dp"
@@ -369,6 +375,7 @@
                     android:visibility="gone"/>
 
                 <TextView
+                    android:id="@+id/total_price"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Pay €6.50"
