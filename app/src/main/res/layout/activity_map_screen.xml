@@ -134,7 +134,7 @@
                     <ImageView
                         android:layout_width="25dp"
                         android:layout_height="25dp"
-                        android:src="@drawable/near_me_150px"
+                        android:src="@drawable/ic_round_my_location_24"
                         android:layout_gravity="center"/>
 
                 </androidx.cardview.widget.CardView>

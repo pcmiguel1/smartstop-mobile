@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -59,10 +60,6 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
-import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
@@ -100,6 +97,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private MapView mapView;
 
     private boolean markerSelected = false;
+    private int selectedPark = 0;
 
     private LocationRequest locationRequest;
     public static final int REQUEST_CHECK_SETTING = 1001;
@@ -114,8 +112,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private DirectionsRoute currentRoute;
     private MapboxDirections client;
 
-    private SymbolManager symbolManager;
-    private Symbol symbol;
+    private RequestQueue requestQueue;
 
     // Variables needed to listen to location updates
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
@@ -123,6 +120,8 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestQueue = Volley.newRequestQueue(MapScreen.this);
 
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
 
@@ -150,11 +149,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                         mapboxMap.getUiSettings().setLogoEnabled(false);
                         enableLocationComponent(style);
 
-                        symbolManager = new SymbolManager(mapView, mapboxMap, style);
-
-                        symbolManager.setIconAllowOverlap(true);
-                        symbolManager.setTextAllowOverlap(true);
-
                         List<Feature> markerCoordinates = new ArrayList<>();
 
                         String url = "http://192.168.1.4:3000/api/parks";
@@ -172,6 +166,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                                                     Feature feature = Feature.fromGeometry(Point.fromLngLat(data.getDouble("park_longitude"), data.getDouble("park_latitude")));
                                                     feature.addStringProperty("PARK_PRICE", data.getDouble("park_price_hour") + "€");
+                                                    feature.addNumberProperty("PARK_ID", data.getInt("park_id"));
                                                     markerCoordinates.add(feature);
 
                                                 }
@@ -223,7 +218,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                             }
                         });
 
-                        RequestQueue requestQueue = Volley.newRequestQueue(MapScreen.this);
                         requestQueue.add(request);
 
                         mapboxMap.addOnMapClickListener(MapScreen.this);
@@ -277,7 +271,8 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             if (features.size() > 0) {
                 markerSelected = true;
 
-                openParkInfo();
+                //Open bottom sheet with park information
+                openParkInfo(features.get(0).getNumberProperty("PARK_ID").intValue());
 
                 //Calcular rota até ao destino
                 Point origin = Point.fromLngLat(userLocation.getLongitude(), userLocation.getLatitude());
@@ -423,7 +418,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         }
     }
 
-    private void openParkInfo() {
+    private void openParkInfo(int id) {
 
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
                 MapScreen.this, R.style.BottomSheetDialogTheme
@@ -433,6 +428,55 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                         R.layout.layout_bottom_sheet_park_info,
                         (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
                 );
+
+        TextView name, address, total_spots, price, hours, hours_status, contact, full_address;
+
+        name = bottomSheetView.findViewById(R.id.park_name);
+        address = bottomSheetView.findViewById(R.id.park_address);
+        total_spots = bottomSheetView.findViewById(R.id.park_totalSpots);
+        price = bottomSheetView.findViewById(R.id.park_price);
+        hours = bottomSheetView.findViewById(R.id.park_hours);
+        hours_status = bottomSheetView.findViewById(R.id.park_hoursStatus);
+        contact = bottomSheetView.findViewById(R.id.park_contact);
+        full_address = bottomSheetView.findViewById(R.id.park_fullAddress);
+
+        String url = "http://192.168.1.4:3000/api/parks/"+id;
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                new com.android.volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        if (response != null) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+
+                                name.setText(jsonObject.getString("park_name"));
+                                address.setText("gmdgjd");
+                                total_spots.setText(jsonObject.getString("park_spots")+" spots");
+                                price.setText(jsonObject.getString("park_price_hour")+"/h");
+                                hours.setText(jsonObject.getString("park_hour_open")+" - "+jsonObject.getString("park_hour_close"));
+                                hours_status.setText("Now is open");
+                                contact.setText(jsonObject.getString("park_contact"));
+                                full_address.setText("fjdkfndnfdkfndkf");
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(MapScreen.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        requestQueue.add(request);
+
 
         bottomSheetView.findViewById(R.id.btn_openBookDetails).setOnClickListener(new View.OnClickListener() {
             @Override

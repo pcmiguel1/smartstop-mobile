@@ -32,6 +32,7 @@
             android:layout_marginRight="30dp">
 
             <TextView
+                android:id="@+id/park_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Lisboa - Castil"
@@ -40,6 +41,7 @@
                 android:textSize="25dp"/>
 
             <TextView
+                android:id="@+id/park_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Rua Castilho, 1250-048"
@@ -78,6 +80,7 @@
                     </androidx.cardview.widget.CardView>
 
                     <TextView
+                        android:id="@+id/park_totalSpots"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="24 spots"
@@ -113,6 +116,7 @@
                     </androidx.cardview.widget.CardView>
 
                     <TextView
+                        android:id="@+id/park_price"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="6.50/h"
@@ -167,6 +171,7 @@
             />
 
         <TextView
+            android:id="@+id/park_hours"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="05:00 - 23:00"
@@ -176,6 +181,7 @@
             />
 
         <TextView
+            android:id="@+id/park_hoursStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Now is open"
@@ -206,6 +212,7 @@
                 android:src="@drawable/phone_150px"/>
 
             <TextView
+                android:id="@+id/park_contact"
                 android:layout_marginLeft="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -228,6 +235,7 @@
             />
 
         <TextView
+            android:id="@+id/park_fullAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Rua Castilho, ..."
