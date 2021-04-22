@@ -7,7 +7,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
 import android.os.Bundle;
@@ -17,6 +16,11 @@ import android.view.animation.BounceInterpolator;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
@@ -55,11 +59,20 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -101,6 +114,9 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private DirectionsRoute currentRoute;
     private MapboxDirections client;
 
+    private SymbolManager symbolManager;
+    private Symbol symbol;
+
     // Variables needed to listen to location updates
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
@@ -134,47 +150,81 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                         mapboxMap.getUiSettings().setLogoEnabled(false);
                         enableLocationComponent(style);
 
+                        symbolManager = new SymbolManager(mapView, mapboxMap, style);
+
+                        symbolManager.setIconAllowOverlap(true);
+                        symbolManager.setTextAllowOverlap(true);
+
                         List<Feature> markerCoordinates = new ArrayList<>();
 
-                        markerCoordinates.add(Feature.fromGeometry(
-                                Point.fromLngLat(-9.1212317,38.722098)));
-                        markerCoordinates.add(Feature.fromGeometry(
-                                Point.fromLngLat(-9.0210615,38.5417719)));
-                        markerCoordinates.add(Feature.fromGeometry(
-                                Point.fromLngLat(-8.6760867,38.4652694)));
+                        String url = "http://192.168.1.4:3000/api/parks";
 
-                        style.addSource(new GeoJsonSource("marker-source",
-                                FeatureCollection.fromFeatures(markerCoordinates)));
+                        StringRequest request = new StringRequest(Request.Method.GET, url,
+                                new com.android.volley.Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
 
-                        //Add the marker image to map
-                        style.addImage("marker-park-price", BitmapFactory.decodeResource(
-                                MapScreen.this.getResources(), R.drawable.marker));
+                                        if (response != null) {
+                                            try {
+                                                JSONArray jsonArray = new JSONArray(response);
+                                                for (int i = 0; i < jsonArray.length(); i++) {
+                                                    JSONObject data = jsonArray.getJSONObject(i);
 
-                        // Adding an offset so that the bottom of the blue icon gets fixed to the coordinate, rather than the
-                        // middle of the icon being fixed to the coordinate point.
-                        style.addLayer(new SymbolLayer("marker-layer", "marker-source")
-                                .withProperties(PropertyFactory.iconImage("marker-park-price"),
-                                        iconAllowOverlap(true),
-                                        textField("2€"),
-                                        textColor("#FFF"),
-                                        textFont(new String[] {"Montserrat Regular"}),
-                                        textSize(15f)));
+                                                    Feature feature = Feature.fromGeometry(Point.fromLngLat(data.getDouble("park_longitude"), data.getDouble("park_latitude")));
+                                                    feature.addStringProperty("PARK_PRICE", data.getDouble("park_price_hour") + "€");
+                                                    markerCoordinates.add(feature);
 
-                        style.addSource(new GeoJsonSource("selected-marker"));
+                                                }
 
-                        //Add the marker image to map
-                        style.addImage("marker-park-selected", BitmapFactory.decodeResource(
-                                MapScreen.this.getResources(), R.drawable.marker2));
+                                                style.addSource(new GeoJsonSource("marker-source",
+                                                        FeatureCollection.fromFeatures(markerCoordinates)));
 
-                        // Adding an offset so that the bottom of the blue icon gets fixed to the coordinate, rather than the
-                        // middle of the icon being fixed to the coordinate point.
-                        style.addLayer(new SymbolLayer("selected-marker-layer", "selected-marker")
-                                .withProperties(PropertyFactory.iconImage("marker-park-selected"),
-                                        iconAllowOverlap(true),
-                                        textField("P"),
-                                        textColor("#000"),
-                                        textFont(new String[] {"Montserrat ExtraBold"}),
-                                        textSize(29f)));
+                                                //Add the marker image to map
+                                                style.addImage("marker-park-price", BitmapFactory.decodeResource(
+                                                        MapScreen.this.getResources(), R.drawable.marker));
+
+                                                // Adding an offset so that the bottom of the blue icon gets fixed to the coordinate, rather than the
+                                                // middle of the icon being fixed to the coordinate point.
+                                                style.addLayer(new SymbolLayer("marker-layer", "marker-source")
+                                                        .withProperties(PropertyFactory.iconImage("marker-park-price"),
+                                                                iconAllowOverlap(true),
+                                                                textField(Expression.get("PARK_PRICE")),
+                                                                textColor("#FFF"),
+                                                                textFont(new String[] {"Montserrat Regular"}),
+                                                                textSize(15f)));
+
+                                                style.addSource(new GeoJsonSource("selected-marker"));
+
+                                                //Add the marker image to map
+                                                style.addImage("marker-park-selected", BitmapFactory.decodeResource(
+                                                        MapScreen.this.getResources(), R.drawable.marker2));
+
+                                                // Adding an offset so that the bottom of the blue icon gets fixed to the coordinate, rather than the
+                                                // middle of the icon being fixed to the coordinate point.
+                                                style.addLayer(new SymbolLayer("selected-marker-layer", "selected-marker")
+                                                        .withProperties(PropertyFactory.iconImage("marker-park-selected"),
+                                                                iconAllowOverlap(true),
+                                                                textField("P"),
+                                                                textColor("#000"),
+                                                                textFont(new String[] {"Montserrat ExtraBold"}),
+                                                                textSize(29f)));
+
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                        }
+
+                                    }
+                                }, new com.android.volley.Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(MapScreen.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        RequestQueue requestQueue = Volley.newRequestQueue(MapScreen.this);
+                        requestQueue.add(request);
 
                         mapboxMap.addOnMapClickListener(MapScreen.this);
 
@@ -197,7 +247,9 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                     (SymbolLayer) style.getLayer("selected-marker-layer");
 
             final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+
             List<Feature> features = mapboxMap.queryRenderedFeatures(pixel, "marker-layer");
+
             List<Feature> selectedFeature = mapboxMap.queryRenderedFeatures(
                     pixel, "selected-marker-layer");
 
@@ -221,15 +273,15 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             if (markerSelected) {
                 markerSelected = false;
             }
+
             if (features.size() > 0) {
                 markerSelected = true;
+
                 openParkInfo();
 
                 //Calcular rota até ao destino
                 Point origin = Point.fromLngLat(userLocation.getLongitude(), userLocation.getLatitude());
                 Point destination = Point.fromLngLat(point.getLongitude(), point.getLatitude());
-                System.out.println("PointO: " + origin);
-                System.out.println("PointD: " + destination);
                 getRoute(mapboxMap, origin, destination);
             }
 
@@ -440,15 +492,12 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     }
 
     /**
-     * Add the route and marker sources to the map
+     * Add the route to the map
      */
     private void initSource(@NonNull Style loadedMapStyle) {
         loadedMapStyle.addSource(new GeoJsonSource(ROUTE_SOURCE_ID));
     }
 
-    /**
-     * Add the route and marker icon layers to the map
-     */
     private void initLayers(@NonNull Style loadedMapStyle) {
         LineLayer routeLayer = new LineLayer(ROUTE_LAYER_ID, ROUTE_SOURCE_ID);
 
@@ -465,9 +514,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     /**
      * Make a request to the Mapbox Directions API. Once successful, pass the route to the
      * route layer.
-     * @param mapboxMap the Mapbox map object that the route will be drawn on
-     * @param origin      the starting point of the route
-     * @param destination the desired finish point of the route
      */
     private void getRoute(MapboxMap mapboxMap, Point origin, Point destination) {
         client = MapboxDirections.builder()
@@ -490,12 +536,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                 // Get the directions route
                 currentRoute = response.body().routes().get(0);
-                System.out.println("Route: " + currentRoute);
-
-                // Make a toast which displays the route's distance
-                /*Toast.makeText(MapScreen.this, String.format(
-                        "Distancia ",
-                        currentRoute.distance()), Toast.LENGTH_SHORT).show();*/
 
                 if (mapboxMap != null) {
                     mapboxMap.getStyle(new Style.OnStyleLoaded() {
