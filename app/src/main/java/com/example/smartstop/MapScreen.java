@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.JsonObject;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
 import com.mapbox.android.core.location.LocationEngineProvider;
@@ -45,6 +47,7 @@ import com.mapbox.api.directions.v5.models.DirectionsResponse;
 import com.mapbox.api.directions.v5.models.DirectionsRoute;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Geometry;
 import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -72,8 +75,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -97,7 +104,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private MapView mapView;
 
     private boolean markerSelected = false;
-    private int selectedPark = 0;
 
     private LocationRequest locationRequest;
     public static final int REQUEST_CHECK_SETTING = 1001;
@@ -167,6 +173,8 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                                                     Feature feature = Feature.fromGeometry(Point.fromLngLat(data.getDouble("park_longitude"), data.getDouble("park_latitude")));
                                                     feature.addStringProperty("PARK_PRICE", data.getDouble("park_price_hour") + "€");
                                                     feature.addNumberProperty("PARK_ID", data.getInt("park_id"));
+                                                    feature.addStringProperty("PARK_LAT", data.getString("park_latitude"));
+                                                    feature.addStringProperty("PARK_LNT", data.getString("park_longitude"));
                                                     markerCoordinates.add(feature);
 
                                                 }
@@ -271,12 +279,15 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             if (features.size() > 0) {
                 markerSelected = true;
 
+                double lat = Double.parseDouble(features.get(0).getStringProperty("PARK_LAT"));
+                double lnt = Double.parseDouble(features.get(0).getStringProperty("PARK_LNT"));
+
                 //Open bottom sheet with park information
-                openParkInfo(features.get(0).getNumberProperty("PARK_ID").intValue());
+                openParkInfo(features.get(0).getNumberProperty("PARK_ID").intValue(), lat, lnt);
 
                 //Calcular rota até ao destino
                 Point origin = Point.fromLngLat(userLocation.getLongitude(), userLocation.getLatitude());
-                Point destination = Point.fromLngLat(point.getLongitude(), point.getLatitude());
+                Point destination = Point.fromLngLat(lnt, lat);
                 getRoute(mapboxMap, origin, destination);
             }
 
@@ -418,7 +429,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         }
     }
 
-    private void openParkInfo(int id) {
+    private void openParkInfo(int id, double lat, double lnt) {
 
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
                 MapScreen.this, R.style.BottomSheetDialogTheme
@@ -451,14 +462,33 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
 
+                                String close_hour = jsonObject.getString("park_hour_close");
+                                String open_hour = jsonObject.getString("park_hour_open");
+
                                 name.setText(jsonObject.getString("park_name"));
-                                address.setText("gmdgjd");
                                 total_spots.setText(jsonObject.getString("park_spots")+" spots");
                                 price.setText(jsonObject.getString("park_price_hour")+"/h");
-                                hours.setText(jsonObject.getString("park_hour_open")+" - "+jsonObject.getString("park_hour_close"));
-                                hours_status.setText("Now is open");
+                                hours.setText(open_hour + " - " + close_hour);
+
                                 contact.setText(jsonObject.getString("park_contact"));
-                                full_address.setText("fjdkfndnfdkfndkf");
+
+                                //Verificar se o parque está fechado ou aberto
+                                SimpleDateFormat formatter = new SimpleDateFormat("HHmm", Locale.getDefault());
+
+                                String now = formatter.format(new Date());
+                                String date_close = close_hour.replace(":", "");
+                                String date_open = open_hour.replace(":", "");
+
+                                boolean isBetween = Integer.parseInt(now) > Integer.parseInt(date_open)
+                                        && Integer.parseInt(now) < Integer.parseInt(date_close);
+
+                                if (isBetween) {
+                                    hours_status.setText("Now is open");
+                                    hours_status.setTextColor(Color.parseColor("#4EB84A"));
+                                } else {
+                                    hours_status.setText("Now is close");
+                                    hours_status.setTextColor(Color.parseColor("#F04444"));
+                                }
 
 
                             } catch (JSONException e) {
@@ -476,6 +506,40 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         });
 
         requestQueue.add(request);
+
+        String url2 = "https://api.mapbox.com/geocoding/v5/mapbox.places/"+lnt+","+lat+".json?limit=1&access_token=pk.eyJ1IjoicGNtaWd1ZWwiLCJhIjoiY2toc3lncG1zMGllajJxcGkxYnNjanVieCJ9.yfUra6VpwwsP4dGk9badRA";
+
+        StringRequest request2 = new StringRequest(Request.Method.GET, url2,
+                new com.android.volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        if (response != null) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+
+                                JSONArray jsonArray = jsonObject.getJSONArray("features");
+
+                                JSONObject parkObject = jsonArray.getJSONObject(0);
+
+                                address.setText(parkObject.getString("text"));
+                                full_address.setText(parkObject.getString("place_name"));
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(MapScreen.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        requestQueue.add(request2);
 
 
         bottomSheetView.findViewById(R.id.btn_openBookDetails).setOnClickListener(new View.OnClickListener() {
