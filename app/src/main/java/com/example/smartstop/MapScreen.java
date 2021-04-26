@@ -159,7 +159,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                         List<Feature> markerCoordinates = new ArrayList<>();
 
-                        String url = "http://192.168.1.4:3000/api/parks";
+                        String url = "http://10.72.120.52:3000/api/parks";
 
                         StringRequest request = new StringRequest(Request.Method.GET, url,
                                 new com.android.volley.Response.Listener<String>() {
@@ -453,7 +453,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         contact = bottomSheetView.findViewById(R.id.park_contact);
         full_address = bottomSheetView.findViewById(R.id.park_fullAddress);
 
-        String url = "http://192.168.1.4:3000/api/parks/"+id;
+        String url = "http://10.72.120.52:3000/api/parks/"+id;
 
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new com.android.volley.Response.Listener<String>() {
@@ -555,6 +555,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                     info.put("name", name.getText().toString());
                     info.put("spots", total_spots.getText().toString());
                     info.put("address", address.getText().toString());
+                    info.put("full_address", full_address.getText().toString());
                     info.put("price", price.getText().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -708,11 +709,14 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         p_spots = bottomSheetView.findViewById(R.id.park_totalSpots);
         p_price = bottomSheetView.findViewById(R.id.park_price);
 
+        String fullAddress = "";
+
         try {
             p_name.setText(info.getString("name"));
             p_address.setText(info.getString("address"));
             p_spots.setText(info.getString("spots"));
             p_price.setText(info.getString("price"));
+            fullAddress = info.getString("full_address");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -731,6 +735,28 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             public void onClick(View v) {
 
                 showDurationDialog(d, price, p_price);
+
+            }
+        });
+
+        final String fullAddressFinal = fullAddress;
+        bottomSheetView.findViewById(R.id.btn_pay).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //Verificar se está tudo preenchido
+                if (startDate.getText() != "" && startHour.getText() != "" && d.getText() != "") {
+
+                    bottomSheetDialog.dismiss();
+                    Intent intent = new Intent(MapScreen.this, ParkingCodeScreen.class);
+                    intent.putExtra("DateFrom", startDate.getText() + " " + startHour.getText());
+                    intent.putExtra("Duration", d.getText());
+                    intent.putExtra("Address", fullAddressFinal);
+                    startActivity(intent);
+
+                } else {
+                    Toast.makeText(MapScreen.this, "Please select a date and duration!", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
@@ -833,7 +859,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                 String hourPrice = p.getText().toString().replace("/h", "");
                 double hourPriceDouble = Double.parseDouble(hourPrice);
                 double dateToHour = calendar.get(Calendar.HOUR_OF_DAY) + (calendar.get(Calendar.MINUTE) / 60.0);
-
                 double total = (dateToHour * hourPriceDouble);
 
                 price.setText("Pay €"+ String.format("%.2f", total).replace(",", "."));
@@ -864,6 +889,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                 TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+
                         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         calendar.set(Calendar.MINUTE, minute);
 

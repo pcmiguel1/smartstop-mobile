@@ -13,8 +13,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class VehiclesScreen extends AppCompatActivity {
 
@@ -41,6 +44,7 @@ public class VehiclesScreen extends AppCompatActivity {
 
                 selectedItem = position;
                 adapter.notifyDataSetChanged();
+                openEditVehicle();
 
             }
         });
@@ -90,5 +94,21 @@ public class VehiclesScreen extends AppCompatActivity {
 
     public void closeVehicles(View view) {
         finish();
+    }
+
+    private void openEditVehicle() {
+
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                VehiclesScreen.this, R.style.BottomSheetDialogTheme
+        );
+        View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                .inflate(
+                        R.layout.layout_bottom_edit_vehicle,
+                        (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
+                );
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+
     }
 }
