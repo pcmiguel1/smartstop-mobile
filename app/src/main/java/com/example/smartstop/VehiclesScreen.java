@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -44,10 +45,19 @@ public class VehiclesScreen extends AppCompatActivity {
 
                 selectedItem = position;
                 adapter.notifyDataSetChanged();
-                openEditVehicle();
+
+                String registration = matriculas[position];
+                String model = modelos[position];
+                openEditVehicle(model, registration);
 
             }
         });
+
+    }
+
+    public void addVehicle(View view) {
+
+        openAddVehicle();
 
     }
 
@@ -96,7 +106,7 @@ public class VehiclesScreen extends AppCompatActivity {
         finish();
     }
 
-    private void openEditVehicle() {
+    private void openEditVehicle(String model, String registration) {
 
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
                 VehiclesScreen.this, R.style.BottomSheetDialogTheme
@@ -104,6 +114,30 @@ public class VehiclesScreen extends AppCompatActivity {
         View bottomSheetView = LayoutInflater.from(getApplicationContext())
                 .inflate(
                         R.layout.layout_bottom_edit_vehicle,
+                        (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
+                );
+
+        EditText vehicleModel, vehicleRegistration;
+
+        vehicleModel = bottomSheetView.findViewById(R.id.vehicle_model);
+        vehicleRegistration = bottomSheetView.findViewById(R.id.vehicle_registration);
+
+        vehicleModel.setText(model);
+        vehicleRegistration.setText(registration);
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+
+    }
+
+    private void openAddVehicle() {
+
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                VehiclesScreen.this, R.style.BottomSheetDialogTheme
+        );
+        View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                .inflate(
+                        R.layout.layout_bottom_add_vehicle,
                         (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
                 );
 

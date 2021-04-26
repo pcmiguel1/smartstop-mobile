@@ -28,6 +28,7 @@
         android:textColor="@color/colorPrimaryDark"/>
 
     <EditText
+        android:id="@+id/vehicle_model"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/colorPrimaryDark"
@@ -43,6 +44,7 @@
         android:inputType="text"/>
 
     <EditText
+        android:id="@+id/vehicle_registration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/colorPrimaryDark"
