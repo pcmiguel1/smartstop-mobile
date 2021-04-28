@@ -2,6 +2,9 @@ package com.example.smartstop;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -13,10 +16,14 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
+import android.widget.AdapterView;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -36,6 +43,7 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
@@ -122,6 +130,8 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
     private RequestQueue requestQueue;
 
+    private EditText inputSearchPark;
+
     // Variables needed to listen to location updates
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
@@ -138,6 +148,15 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        inputSearchPark = findViewById(R.id.input_search_park);
+
+        inputSearchPark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSearchPark();
+            }
+        });
 
         turnOnGPS();
 
@@ -159,7 +178,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                         List<Feature> markerCoordinates = new ArrayList<>();
 
-                        String url = "http://192.168.1.4:3000/api/parks";
+                        String url = "http://10.72.122.84:3000/api/parks";
 
                         StringRequest request = new StringRequest(Request.Method.GET, url,
                                 new com.android.volley.Response.Listener<String>() {
@@ -431,6 +450,40 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         }
     }
 
+    private void openSearchPark() {
+
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                MapScreen.this, R.style.BottomSheetDialogTheme
+        );
+        View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                .inflate(
+                        R.layout.layout_bottom_search_park,
+                        (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
+                );
+
+        //List type parking
+        RecyclerView recyclerView = bottomSheetView.findViewById(R.id.list_type_parking);
+        TypeParkingAdapter typeParkingAdapter = new TypeParkingAdapter(this);
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(typeParkingAdapter);
+
+        //List Parking features
+        RecyclerView recyclerView2 = bottomSheetView.findViewById(R.id.list_features_parking);
+        FeatureParkingAdapter featureParkingAdapter = new FeatureParkingAdapter(this);
+
+        RecyclerView.LayoutManager layoutManager2 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerView2.setLayoutManager(layoutManager2);
+        recyclerView2.setItemAnimator(new DefaultItemAnimator());
+        recyclerView2.setAdapter(featureParkingAdapter);
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+
+    }
+
     private void openParkInfo(int id, double lat, double lnt) {
 
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
@@ -453,7 +506,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         contact = bottomSheetView.findViewById(R.id.park_contact);
         full_address = bottomSheetView.findViewById(R.id.park_fullAddress);
 
-        String url = "http://192.168.1.4:3000/api/parks/"+id;
+        String url = "http://10.72.122.84:3000/api/parks/"+id;
 
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new com.android.volley.Response.Listener<String>() {

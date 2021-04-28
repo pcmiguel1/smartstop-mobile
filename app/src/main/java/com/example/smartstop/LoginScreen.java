@@ -54,7 +54,7 @@ public class LoginScreen extends AppCompatActivity {
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-            String url = "http://192.168.1.4:3000/api/users/login";
+            String url = "http://10.72.122.84:3000/api/users/login";
 
             JSONObject jsonObject = new JSONObject();
             try {

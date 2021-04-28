@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomSheetBookDetails"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_background"
+    android:paddingHorizontal="20dp"
+    android:orientation="vertical">
+    
+    <androidx.cardview.widget.CardView
+        android:layout_width="45dp"
+        android:layout_height="5dp"
+        android:backgroundTint="#D2D2D2"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="20dp"
+        android:layout_gravity="center_horizontal"
+        app:cardElevation="0dp"
+        />
+
+    <LinearLayout
+        android:id="@+id/search_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:weightSum="2"
+        android:layout_alignParentBottom="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:padding="20dp"
+            android:gravity="center">
+
+            <LinearLayout
+                android:id="@+id/layout_search"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/search_150px"
+                    android:layout_gravity="center"/>
+
+                <EditText
+                    android:id="@+id/input_search_park"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Parking address..."
+                    android:textColor="@color/colorGray"
+                    android:textColorHint="@color/colorGray"
+                    android:fontFamily="@font/montserratregular"
+                    android:textSize="15dp"
+                    android:layout_marginLeft="10dp"
+                    android:background="@android:color/transparent"
+                    />
+
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_toRightOf="@+id/layout_search"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/more_than_150px"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type of Parking"
+        android:textSize="15sp"
+        android:textColor="@color/colorPrimaryDark"
+        android:fontFamily="@font/montserratregular"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_type_parking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Parking features"
+        android:textSize="15sp"
+        android:textColor="@color/colorPrimaryDark"
+        android:fontFamily="@font/montserratregular"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_features_parking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"/>
+
+</LinearLayout>
