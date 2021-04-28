@@ -179,16 +179,17 @@
                     android:src="@drawable/search_150px"
                     android:layout_gravity="center"/>
 
-                <EditText
+                <TextView
                     android:id="@+id/input_search_park"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Parking address..."
+                    android:text="Parking address..."
                     android:textColor="@color/colorGray"
                     android:textColorHint="@color/colorGray"
                     android:fontFamily="@font/montserratregular"
                     android:textSize="15dp"
                     android:layout_marginLeft="10dp"
+                    android:layout_gravity="center"
                     />
 
 

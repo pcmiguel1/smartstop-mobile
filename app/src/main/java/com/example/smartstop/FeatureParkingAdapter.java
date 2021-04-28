@@ -18,7 +18,7 @@ public class FeatureParkingAdapter extends RecyclerView.Adapter<FeatureParkingAd
         this.context = context;
     }
 
-    public int[] imagesList = {R.drawable.categorypremium, R.drawable.categorypremium, R.drawable.categorypremium, R.drawable.categorypremium};
+    public int[] imagesList = {R.drawable.assistive_technology_80px, R.drawable.electrical_80px, R.drawable.defense_80px, R.drawable.umbrella_80px};
 
     public String[] titlesList = {"Handicapped", "Charger", "Guard", "Covered"};
 

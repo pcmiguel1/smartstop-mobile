@@ -20,7 +20,7 @@ public class TypeParkingAdapter extends RecyclerView.Adapter<TypeParkingAdapter.
         this.context = context;
     }
 
-    public int[] imagesList = {R.drawable.categorypremium, R.drawable.categorypremium};
+    public int[] imagesList = {R.drawable.people_80px, R.drawable.unfriend_80px};
 
     public String[] titlesList = {"Public", "Private"};
 

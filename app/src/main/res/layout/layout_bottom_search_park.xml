@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_background"
-    android:paddingHorizontal="20dp"
     android:orientation="vertical">
     
     <androidx.cardview.widget.CardView
@@ -55,6 +54,7 @@
                     android:textSize="15dp"
                     android:layout_marginLeft="10dp"
                     android:background="@android:color/transparent"
+                    android:layout_gravity="center"
                     />
 
 
@@ -73,6 +73,7 @@
     </LinearLayout>
 
     <TextView
+        android:layout_marginLeft="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Type of Parking"
@@ -81,6 +82,7 @@
         android:fontFamily="@font/montserratregular"/>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginLeft="20dp"
         android:id="@+id/list_type_parking"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -88,6 +90,7 @@
         android:layout_marginTop="10dp"/>
 
     <TextView
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -97,6 +100,7 @@
         android:fontFamily="@font/montserratregular"/>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginLeft="20dp"
         android:id="@+id/list_features_parking"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
