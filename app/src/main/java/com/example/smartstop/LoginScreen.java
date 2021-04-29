@@ -70,12 +70,20 @@ public class LoginScreen extends AppCompatActivity {
                         public void onResponse(JSONObject response) {
                             progressBar.setVisibility(view.GONE);
                             try {
-
                                 if (response.getInt("success") == 1) {
                                     Intent intent = new Intent(LoginScreen.this, MapScreen.class);
                                     startActivity(intent);
                                     finish();
-                                } else {
+                                }
+                                else if (response.getInt("success") == 3) { //se não tiver a conta ativada
+                                    Toast.makeText(LoginScreen.this, response.getString("msg"), Toast.LENGTH_LONG).show();
+                                    Intent intent = new Intent(LoginScreen.this, TokenScreen.class);
+                                    intent.putExtra("email", email);
+                                    intent.putExtra("password", password);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                                else {
                                     Toast.makeText(LoginScreen.this, response.getString("msg"), Toast.LENGTH_LONG).show();
                                 }
 

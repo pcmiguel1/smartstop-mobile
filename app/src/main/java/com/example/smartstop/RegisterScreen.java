@@ -78,7 +78,9 @@ public class RegisterScreen extends AppCompatActivity {
                             @Override
                             public void onResponse(JSONObject response) {
                                 progressBar.setVisibility(view.GONE);
-                                Intent intent = new Intent(RegisterScreen.this, LoginScreen.class);
+                                Intent intent = new Intent(RegisterScreen.this, TokenScreen.class);
+                                intent.putExtra("email", email);
+                                intent.putExtra("password", password);
                                 startActivity(intent);
                                 finish();
                             }
@@ -118,5 +120,10 @@ public class RegisterScreen extends AppCompatActivity {
             Toast.makeText(this, "Fill in the spaces above!", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    public void openLogin(View view) {
+        Intent intent = new Intent(RegisterScreen.this, LoginScreen.class);
+        startActivity(intent);
     }
 }

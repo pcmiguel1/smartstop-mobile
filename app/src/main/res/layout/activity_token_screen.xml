@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TokenScreen"
+    android:orientation="vertical"
+    android:background="@color/colorAccent"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical" >
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/more_than_150px"
+            android:rotation="180"
+            android:onClick="back"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="25dp"
+            android:text="Verification"
+            android:fontFamily="@font/montserratregular"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_marginLeft="15dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter the code from the email we just send you."
+            android:textColor="@color/colorGray"
+            android:textSize="15dp"
+            android:fontFamily="@font/montserratregular"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="40dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="10dp">
+
+            <EditText
+                android:id="@+id/input_token1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="#EDF2F7"
+                android:maxLength="1"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="18sp"
+                android:inputType="text"
+                android:gravity="center"
+                android:imeOptions="actionNext"/>
+
+            <EditText
+                android:id="@+id/input_token2"
+                android:layout_marginLeft="15dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="#EDF2F7"
+                android:maxLength="1"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="18sp"
+                android:inputType="text"
+                android:gravity="center"
+                android:imeOptions="actionNext"/>
+
+            <EditText
+                android:id="@+id/input_token3"
+                android:layout_marginLeft="15dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="#EDF2F7"
+                android:maxLength="1"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="18sp"
+                android:inputType="text"
+                android:gravity="center"
+                android:imeOptions="actionNext"/>
+
+            <EditText
+                android:id="@+id/input_token4"
+                android:layout_marginLeft="15dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@drawable/custom_button"
+                android:backgroundTint="#EDF2F7"
+                android:maxLength="1"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="18sp"
+                android:inputType="text"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Resend code"
+                android:textSize="13dp"
+                android:fontFamily="@font/montserratsemibold"
+                android:textColor="@color/colorPrimaryDark"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/custom_button"
+            android:padding="10dp"
+            android:gravity="center"
+            android:onClick="verifyAccount"
+            android:layout_marginTop="40dp">
+
+            <ProgressBar
+                android:id="@+id/progressVerify"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorPrimaryDark"
+                android:indeterminateTintMode="src_atop"
+                android:layout_marginRight="10dp"
+                android:visibility="gone"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Verify"
+                android:textColor="@color/colorPrimaryDark"
+                android:textAllCaps="true"
+                android:fontFamily="@font/montserratregular"
+                android:textSize="20dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
