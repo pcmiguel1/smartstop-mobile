@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical" >
-        
+
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
@@ -30,7 +30,7 @@
             android:fontFamily="@font/montserratregular"
             android:textColor="@color/colorPrimaryDark"
             android:layout_marginLeft="15dp"/>
-        
+
     </LinearLayout>
 
     <LinearLayout
@@ -104,8 +104,10 @@
                         android:textSize="18dp"
                         android:textCursorDrawable="@null"
                         android:hint="example@email.com"
+                        android:inputType="textEmailAddress"
                         android:textColorHint="#777777"
-                        android:fontFamily="@font/montserratregular"/>
+                        android:fontFamily="@font/montserratregular"
+                        android:imeOptions="actionNext"/>
 
                 </LinearLayout>
 
@@ -157,6 +159,7 @@
                         android:hint="........"
                         android:textColorHint="#777777"
                         android:fontFamily="@font/montserratregular"
+                        android:imeOptions="actionDone"
                         />
 
                 </LinearLayout>
@@ -169,7 +172,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="right"
-            android:layout_marginTop="5dp">
+            android:layout_marginTop="5dp"
+            android:onClick="openRecoverAccount">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -180,7 +184,7 @@
                 android:textColor="@color/colorPrimaryDark"/>
 
         </LinearLayout>
-        
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -190,7 +194,7 @@
             android:gravity="center"
             android:onClick="login"
             android:layout_marginTop="40dp">
-            
+
             <ProgressBar
                 android:id="@+id/progressLogin"
                 android:layout_width="30dp"
@@ -210,9 +214,9 @@
                 android:fontFamily="@font/montserratregular"
                 android:textSize="20dp"
                 />
-            
+
         </LinearLayout>
 
     </LinearLayout>
-    
+
 </LinearLayout>

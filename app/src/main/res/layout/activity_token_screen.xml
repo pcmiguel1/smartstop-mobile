@@ -115,7 +115,8 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="18sp"
                 android:inputType="text"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:imeOptions="actionDone"/>
 
         </LinearLayout>
 

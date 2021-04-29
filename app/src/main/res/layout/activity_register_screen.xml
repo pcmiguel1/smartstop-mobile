@@ -106,7 +106,8 @@
                         android:hint="insert your full name"
                         android:inputType="textPersonName"
                         android:textColorHint="#777777"
-                        android:fontFamily="@font/montserratregular"/>
+                        android:fontFamily="@font/montserratregular"
+                        android:imeOptions="actionNext"/>
 
                 </LinearLayout>
 
@@ -157,7 +158,8 @@
                         android:hint="example@email.com"
                         android:inputType="textEmailAddress"
                         android:textColorHint="#777777"
-                        android:fontFamily="@font/montserratregular"/>
+                        android:fontFamily="@font/montserratregular"
+                        android:imeOptions="actionNext"/>
 
                 </LinearLayout>
 
@@ -209,6 +211,7 @@
                         android:hint="........"
                         android:textColorHint="#777777"
                         android:fontFamily="@font/montserratregular"
+                        android:imeOptions="actionNext"
                         />
 
                 </LinearLayout>
@@ -261,6 +264,7 @@
                         android:hint="........"
                         android:textColorHint="#777777"
                         android:fontFamily="@font/montserratregular"
+                        android:imeOptions="actionDone"
                         />
 
                 </LinearLayout>

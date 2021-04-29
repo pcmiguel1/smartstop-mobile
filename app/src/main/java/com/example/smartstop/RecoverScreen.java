@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -23,19 +22,18 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
-public class LoginScreen extends AppCompatActivity {
+public class RecoverScreen extends AppCompatActivity {
 
+    private EditText inputEmail;
     private ProgressBar progressBar;
-    private EditText inputEmail, inputPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_screen);
+        setContentView(R.layout.activity_recover_screen);
 
-        progressBar = findViewById(R.id.progressLogin);
         inputEmail = findViewById(R.id.input_email);
-        inputPassword = findViewById(R.id.input_password);
+        progressBar = findViewById(R.id.progressRecover);
 
     }
 
@@ -43,50 +41,35 @@ public class LoginScreen extends AppCompatActivity {
         finish();
     }
 
-    public void login(View view) {
+    public void resetPassword(View view) {
 
         String email = inputEmail.getText().toString();
-        String password = inputPassword.getText().toString();
 
-        if (!email.isEmpty() && !password.isEmpty()) {
+        if (!email.isEmpty()) {
 
             progressBar.setVisibility(view.VISIBLE);
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-            String url = "http://192.168.1.4:3000/api/users/login";
+            String url = "http://192.168.1.4:3000/api/users/recover";
 
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("email", email);
-                jsonObject.put("password", password);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            JsonObjectRequest request_json = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+            JsonObjectRequest request_json = new JsonObjectRequest(Request.Method.PUT, url, jsonObject,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
                             progressBar.setVisibility(view.GONE);
                             try {
-                                if (response.getInt("success") == 1) {
-                                    Intent intent = new Intent(LoginScreen.this, MapScreen.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                                else if (response.getInt("success") == 3) { //se não tiver a conta ativada
-                                    Toast.makeText(LoginScreen.this, response.getString("msg"), Toast.LENGTH_LONG).show();
-                                    Intent intent = new Intent(LoginScreen.this, TokenScreen.class);
-                                    intent.putExtra("email", email);
-                                    intent.putExtra("password", password);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                                else {
-                                    Toast.makeText(LoginScreen.this, response.getString("msg"), Toast.LENGTH_LONG).show();
-                                }
-
+                                Toast.makeText(RecoverScreen.this, response.getString("msg"), Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(RecoverScreen.this, LoginScreen.class);
+                                startActivity(intent);
+                                finish();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -103,7 +86,7 @@ public class LoginScreen extends AppCompatActivity {
                                 String responseBody = new String(error.networkResponse.data, "utf-8");
                                 JSONObject data = new JSONObject(responseBody);
                                 String message = data.optString("msg");
-                                Toast.makeText(LoginScreen.this, message, Toast.LENGTH_LONG).show();
+                                Toast.makeText(RecoverScreen.this, message, Toast.LENGTH_LONG).show();
                             } catch (UnsupportedEncodingException e) {
                                 e.printStackTrace();
                             } catch (JSONException e) {
@@ -117,17 +100,10 @@ public class LoginScreen extends AppCompatActivity {
 
             requestQueue.add(request_json);
 
-        } else {
+        }
+        else {
             Toast.makeText(this, "Fill in the spaces above!", Toast.LENGTH_LONG).show();
         }
-
-    }
-
-    public void openRecoverAccount(View view) {
-
-        Intent intent = new Intent(LoginScreen.this, RecoverScreen.class);
-        startActivity(intent);
-        finish();
 
     }
 }
