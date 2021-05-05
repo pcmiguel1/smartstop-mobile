@@ -60,6 +60,7 @@
         android:inputType="text"/>
 
     <LinearLayout
+        android:id="@+id/btn_edit_vehicle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -80,6 +81,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/btn_delete_vehicle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

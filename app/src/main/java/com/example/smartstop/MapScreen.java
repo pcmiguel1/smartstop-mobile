@@ -184,7 +184,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                         List<Feature> markerCoordinates = new ArrayList<>();
 
-                        String url = "http://10.72.120.186:3000/api/parks";
+                        String url = "http://192.168.1.4:3000/api/parks";
 
                         StringRequest request = new StringRequest(Request.Method.GET, url,
                                 new com.android.volley.Response.Listener<String>() {
@@ -512,7 +512,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         contact = bottomSheetView.findViewById(R.id.park_contact);
         full_address = bottomSheetView.findViewById(R.id.park_fullAddress);
 
-        String url = "http://10.72.120.186:3000/api/parks/"+id;
+        String url = "http://192.168.1.4:3000/api/parks/"+id;
 
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new com.android.volley.Response.Listener<String>() {

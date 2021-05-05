@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
@@ -32,12 +32,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class VehiclesScreen extends AppCompatActivity {
 
+    private LinearLayout boxNoVehicles;
     private ListView listViewVehicles;
     private RequestQueue requestQueue;
     private ArrayList<Vehicle> vehicles;
@@ -53,16 +55,18 @@ public class VehiclesScreen extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(VehiclesScreen.this);
 
+        boxNoVehicles = findViewById(R.id.box_no_vehicles);
         listViewVehicles = findViewById(R.id.listView_vehicles);
 
         vehicles = new ArrayList<>();
 
-        try {
+        /*try {
             getVehicles(MapScreen.USER_JSON_OBJECT.getInt("user_id"));
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
 
+        getVehicles(21);
 
         listViewVehicles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -73,7 +77,7 @@ public class VehiclesScreen extends AppCompatActivity {
 
                 String registration = vehicles.get(position).getRegistration();
                 String model = vehicles.get(position).getModel();
-                openEditVehicle(model, registration);
+                openEditVehicle(vehicles.get(position).getId(), position, model, registration);
 
             }
         });
@@ -82,7 +86,7 @@ public class VehiclesScreen extends AppCompatActivity {
 
     private void getVehicles(int id) {
 
-        String url = "http://10.72.120.186:3000/api/users/"+id+"/vehicles";
+        String url = "http://192.168.1.4:3000/api/users/"+id+"/vehicles";
 
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new com.android.volley.Response.Listener<String>() {
@@ -99,14 +103,108 @@ public class VehiclesScreen extends AppCompatActivity {
 
                                 }
 
+                                listViewVehicles.setVisibility(View.VISIBLE);
+                                boxNoVehicles.setVisibility(View.INVISIBLE);
+                                adapter = new MyAdapter(VehiclesScreen.this, tipos, vehicles);
+                                listViewVehicles.setAdapter(adapter);
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
                         }
 
-                        adapter = new MyAdapter(VehiclesScreen.this, tipos, vehicles);
-                        listViewVehicles.setAdapter(adapter);
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null) {
+                    int status = networkResponse.statusCode;
+                    if (status == 404) {
+                        listViewVehicles.setVisibility(View.INVISIBLE);
+                        boxNoVehicles.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
+
+        requestQueue.add(request);
+
+    }
+
+    public void addVehicle(View view) {
+
+        openAddVehicle();
+
+    }
+
+    public void closeVehicles(View view) {
+        finish();
+    }
+
+    private void openEditVehicle(int id, int position, String model, String registration) {
+
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                VehiclesScreen.this, R.style.BottomSheetDialogTheme
+        );
+        View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                .inflate(
+                        R.layout.layout_bottom_edit_vehicle,
+                        (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
+                );
+
+        EditText vehicleModel, vehicleRegistration;
+
+        vehicleModel = bottomSheetView.findViewById(R.id.vehicle_model);
+        vehicleRegistration = bottomSheetView.findViewById(R.id.vehicle_registration);
+
+        vehicleModel.setText(model);
+        vehicleRegistration.setText(registration);
+
+        //Botão de editar
+        bottomSheetView.findViewById(R.id.btn_edit_vehicle).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter.notifyDataSetChanged();
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+        //Botão para remover
+        bottomSheetView.findViewById(R.id.btn_delete_vehicle).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                deleteVehicle(id, position);
+                bottomSheetDialog.dismiss();
+                Toast.makeText(VehiclesScreen.this, "Vehicle successfully removed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+
+    }
+
+    private void deleteVehicle(int id, int position) {
+
+        String url = "http://192.168.1.4:3000/api/vehicles/"+id+"/delete";
+
+        StringRequest request = new StringRequest(Request.Method.DELETE, url,
+                new com.android.volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        if (response != null) {
+                            vehicles.remove(position);
+                            adapter.notifyDataSetChanged();
+
+                            if (vehicles.size() == 0) {
+                                listViewVehicles.setVisibility(View.INVISIBLE);
+                                boxNoVehicles.setVisibility(View.VISIBLE);
+                            }
+
+                        }
 
                     }
                 }, new com.android.volley.Response.ErrorListener() {
@@ -120,9 +218,19 @@ public class VehiclesScreen extends AppCompatActivity {
 
     }
 
-    public void addVehicle(View view) {
+    private void openAddVehicle() {
 
-        openAddVehicle();
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                VehiclesScreen.this, R.style.BottomSheetDialogTheme
+        );
+        View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                .inflate(
+                        R.layout.layout_bottom_add_vehicle,
+                        (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
+                );
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
 
     }
 
@@ -161,49 +269,5 @@ public class VehiclesScreen extends AppCompatActivity {
 
             return row;
         }
-    }
-
-    public void closeVehicles(View view) {
-        finish();
-    }
-
-    private void openEditVehicle(String model, String registration) {
-
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
-                VehiclesScreen.this, R.style.BottomSheetDialogTheme
-        );
-        View bottomSheetView = LayoutInflater.from(getApplicationContext())
-                .inflate(
-                        R.layout.layout_bottom_edit_vehicle,
-                        (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
-                );
-
-        EditText vehicleModel, vehicleRegistration;
-
-        vehicleModel = bottomSheetView.findViewById(R.id.vehicle_model);
-        vehicleRegistration = bottomSheetView.findViewById(R.id.vehicle_registration);
-
-        vehicleModel.setText(model);
-        vehicleRegistration.setText(registration);
-
-        bottomSheetDialog.setContentView(bottomSheetView);
-        bottomSheetDialog.show();
-
-    }
-
-    private void openAddVehicle() {
-
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
-                VehiclesScreen.this, R.style.BottomSheetDialogTheme
-        );
-        View bottomSheetView = LayoutInflater.from(getApplicationContext())
-                .inflate(
-                        R.layout.layout_bottom_add_vehicle,
-                        (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
-                );
-
-        bottomSheetDialog.setContentView(bottomSheetView);
-        bottomSheetDialog.show();
-
     }
 }
