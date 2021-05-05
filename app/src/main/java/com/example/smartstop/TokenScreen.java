@@ -119,7 +119,7 @@ public class TokenScreen extends AppCompatActivity {
 
                 RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-                String url = "http://192.168.1.4:3000/api/users/verify";
+                String url = "http://10.72.120.186:3000/api/users/verify";
 
                 JSONObject jsonObject = new JSONObject();
                 try {

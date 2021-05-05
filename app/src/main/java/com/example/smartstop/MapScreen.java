@@ -16,14 +16,10 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
-import android.widget.AdapterView;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -43,7 +39,6 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
@@ -132,12 +127,23 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
     private TextView inputSearchPark;
 
+    public static JSONObject USER_JSON_OBJECT;
+
     // Variables needed to listen to location updates
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Saber as informações do utilizador que fez o login
+        if(getIntent().hasExtra("user")) {
+            try {
+                USER_JSON_OBJECT = new JSONObject(getIntent().getStringExtra("user"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         requestQueue = Volley.newRequestQueue(MapScreen.this);
 
@@ -178,7 +184,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                         List<Feature> markerCoordinates = new ArrayList<>();
 
-                        String url = "http://192.168.1.4:3000/api/parks";
+                        String url = "http://10.72.120.186:3000/api/parks";
 
                         StringRequest request = new StringRequest(Request.Method.GET, url,
                                 new com.android.volley.Response.Listener<String>() {
@@ -506,7 +512,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         contact = bottomSheetView.findViewById(R.id.park_contact);
         full_address = bottomSheetView.findViewById(R.id.park_fullAddress);
 
-        String url = "http://192.168.1.4:3000/api/parks/"+id;
+        String url = "http://10.72.120.186:3000/api/parks/"+id;
 
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new com.android.volley.Response.Listener<String>() {

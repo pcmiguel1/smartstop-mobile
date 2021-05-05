@@ -54,7 +54,7 @@ public class LoginScreen extends AppCompatActivity {
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-            String url = "http://192.168.1.4:3000/api/users/login";
+            String url = "http://10.72.120.186:3000/api/users/login";
 
             JSONObject jsonObject = new JSONObject();
             try {
@@ -72,6 +72,7 @@ public class LoginScreen extends AppCompatActivity {
                             try {
                                 if (response.getInt("success") == 1) {
                                     Intent intent = new Intent(LoginScreen.this, MapScreen.class);
+                                    intent.putExtra("user", response.getJSONObject("data").toString());
                                     startActivity(intent);
                                     finish();
                                 }
