@@ -29,4 +29,20 @@ public class Vehicle {
     public int getType() {
         return type;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public void setRegistration(String registration) {
+        this.registration = registration;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 }

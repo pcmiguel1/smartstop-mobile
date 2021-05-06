@@ -54,6 +54,7 @@
 
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/vehicle_type1"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:backgroundTint="#EDF2F7"
@@ -70,6 +71,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/vehicle_type2"
                 android:layout_marginLeft="20dp"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
@@ -87,6 +89,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/vehicle_type3"
                 android:layout_marginLeft="20dp"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
@@ -104,6 +107,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/vehicle_type4"
                 android:layout_marginLeft="20dp"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
@@ -138,7 +142,8 @@
         android:backgroundTint="#EDF2F7"
         android:padding="15dp"
         android:layout_marginTop="20dp"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:imeOptions="actionNext"/>
 
     <EditText
         android:id="@+id/vehicle_registration"
@@ -154,9 +159,11 @@
         android:backgroundTint="#EDF2F7"
         android:padding="15dp"
         android:layout_marginTop="20dp"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:imeOptions="actionDone"/>
 
     <LinearLayout
+        android:id="@+id/btn_confirm_add"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

@@ -22,7 +22,9 @@ import android.widget.Toast;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -32,7 +34,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +48,8 @@ public class VehiclesScreen extends AppCompatActivity {
     int tipos[] = {R.drawable.categorybasic, R.drawable.categorybolt, R.drawable.categoryminivan, R.drawable.categorypremium};
 
     private int selectedItem;
+    private int selectedType = 0;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +63,15 @@ public class VehiclesScreen extends AppCompatActivity {
 
         vehicles = new ArrayList<>();
 
-        /*try {
-            getVehicles(MapScreen.USER_JSON_OBJECT.getInt("user_id"));
+        try {
+            userId = MapScreen.USER_JSON_OBJECT.getInt("user_id");
         } catch (JSONException e) {
             e.printStackTrace();
-        }*/
+        }
 
-        getVehicles(21);
+        System.out.println("userId: " + userId);
+
+        getVehicles(userId);
 
         listViewVehicles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -103,10 +108,16 @@ public class VehiclesScreen extends AppCompatActivity {
 
                                 }
 
-                                listViewVehicles.setVisibility(View.VISIBLE);
-                                boxNoVehicles.setVisibility(View.INVISIBLE);
-                                adapter = new MyAdapter(VehiclesScreen.this, tipos, vehicles);
-                                listViewVehicles.setAdapter(adapter);
+                                System.out.println("sizeVehicles: " + vehicles.size());
+
+                                if (!vehicles.isEmpty()) {
+
+                                    listViewVehicles.setVisibility(View.VISIBLE);
+                                    boxNoVehicles.setVisibility(View.INVISIBLE);
+                                    adapter = new MyAdapter(VehiclesScreen.this, tipos, vehicles);
+                                    listViewVehicles.setAdapter(adapter);
+
+                                }
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -165,8 +176,19 @@ public class VehiclesScreen extends AppCompatActivity {
         bottomSheetView.findViewById(R.id.btn_edit_vehicle).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                adapter.notifyDataSetChanged();
-                bottomSheetDialog.dismiss();
+
+                String inputModel = vehicleModel.getText().toString();
+                String inputRegistration = vehicleRegistration.getText().toString();
+
+                if (selectedType != 0 && !inputModel.isEmpty() && !inputRegistration.isEmpty()) {
+
+                    editVehicle(id, position, inputModel, inputRegistration);
+                    bottomSheetDialog.dismiss();
+                    Toast.makeText(VehiclesScreen.this, "Vehicle successfully edited!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    Toast.makeText(VehiclesScreen.this, "Fill in the spaces above!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -177,12 +199,49 @@ public class VehiclesScreen extends AppCompatActivity {
 
                 deleteVehicle(id, position);
                 bottomSheetDialog.dismiss();
-                Toast.makeText(VehiclesScreen.this, "Vehicle successfully removed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VehiclesScreen.this, "Vehicle successfully removed!", Toast.LENGTH_SHORT).show();
             }
         });
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
+
+    }
+
+    private void editVehicle(int id, int position, String vehicleModel, String vehicleRegistration) {
+
+        String url = "http://192.168.1.4:3000/api/vehicles/"+id+"/edit";
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("model", vehicleModel);
+            jsonObject.put("registration", vehicleRegistration);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request_json = new JsonObjectRequest(Request.Method.PUT, url, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        if (response != null) {
+
+                            vehicles.get(position).setModel(vehicleModel);
+                            vehicles.get(position).setModel(vehicleRegistration);
+                            adapter.notifyDataSetChanged();
+
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        requestQueue.add(request_json);
 
     }
 
@@ -229,8 +288,132 @@ public class VehiclesScreen extends AppCompatActivity {
                         (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
                 );
 
+        CardView type1, type2, type3, type4;
+        EditText model, registration;
+        LinearLayout btnConfirmAdd;
+        type1 = bottomSheetView.findViewById(R.id.vehicle_type1);
+        type2 = bottomSheetView.findViewById(R.id.vehicle_type2);
+        type3 = bottomSheetView.findViewById(R.id.vehicle_type3);
+        type4 = bottomSheetView.findViewById(R.id.vehicle_type4);
+        model = bottomSheetView.findViewById(R.id.vehicle_model);
+        registration = bottomSheetView.findViewById(R.id.vehicle_registration);
+        btnConfirmAdd = bottomSheetView.findViewById(R.id.btn_confirm_add);
+
+
+        type1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedType = 1;
+                v.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
+                type2.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+                type3.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+                type4.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+            }
+        });
+
+        type2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedType = 2;
+                v.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
+                type1.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+                type3.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+                type4.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+            }
+        });
+
+        type3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedType = 3;
+                v.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
+                type1.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+                type2.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+                type4.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+            }
+        });
+
+        type4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedType = 4;
+                v.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
+                type1.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+                type2.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+                type3.setBackgroundTintList(getResources().getColorStateList(R.color.colorG));
+            }
+        });
+
+        btnConfirmAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String inputModel = model.getText().toString();
+                String inputRegistration = registration.getText().toString();
+
+                if (selectedType != 0 && !inputModel.isEmpty() && !inputRegistration.isEmpty()) {
+
+                    addVehicle(inputModel, inputRegistration);
+                    bottomSheetDialog.dismiss();
+                    Toast.makeText(VehiclesScreen.this, "Vehicle successfully added!", Toast.LENGTH_SHORT).show();
+
+                    if (listViewVehicles.getVisibility() != View.VISIBLE) {
+                        listViewVehicles.setVisibility(View.VISIBLE);
+                        boxNoVehicles.setVisibility(View.INVISIBLE);
+                    }
+
+
+                } else {
+                    Toast.makeText(VehiclesScreen.this, "Fill in the spaces above!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
+
+    }
+
+    private void addVehicle(String model, String registration) {
+
+        String url = "http://192.168.1.4:3000/api/users/"+userId+"/vehicles/new";
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("model", model);
+            jsonObject.put("registration", registration);
+            jsonObject.put("type", selectedType);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request_json = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+
+                        if (response != null) {
+
+                            try {
+                                vehicles.add(new Vehicle(response.getInt("insertId"), model, registration, selectedType));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            adapter.notifyDataSetChanged();
+
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        requestQueue.add(request_json);
 
     }
 
@@ -256,9 +439,9 @@ public class VehiclesScreen extends AppCompatActivity {
             TextView myModelo = row.findViewById(R.id.modelo_car);
             CardView myCardVehicle = row.findViewById(R.id.card_vehicle);
 
-            images.setImageResource(rTipos[getItem(position).getType()]);
-            myMatricula.setText(getItem(position).getRegistration());
-            myModelo.setText(getItem(position).getModel());
+            images.setImageResource(rTipos[vehicles.get(position).getType()-1]);
+            myMatricula.setText(vehicles.get(position).getRegistration());
+            myModelo.setText(vehicles.get(position).getModel());
 
             if (position == selectedItem) {
 

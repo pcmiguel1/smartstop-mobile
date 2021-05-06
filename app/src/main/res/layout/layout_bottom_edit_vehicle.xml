@@ -41,7 +41,8 @@
         android:backgroundTint="#EDF2F7"
         android:padding="15dp"
         android:layout_marginTop="20dp"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:imeOptions="actionNext"/>
 
     <EditText
         android:id="@+id/vehicle_registration"
@@ -57,7 +58,8 @@
         android:backgroundTint="#EDF2F7"
         android:padding="15dp"
         android:layout_marginTop="20dp"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:imeOptions="actionDone"/>
 
     <LinearLayout
         android:id="@+id/btn_edit_vehicle"
