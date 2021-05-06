@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +60,9 @@ public class VehiclesScreen extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(VehiclesScreen.this);
 
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("smartstop", 0);
+        selectedItem = settings.getInt("vehicleId", 0);
+
         boxNoVehicles = findViewById(R.id.box_no_vehicles);
         listViewVehicles = findViewById(R.id.listView_vehicles);
 
@@ -69,21 +74,24 @@ public class VehiclesScreen extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        System.out.println("userId: " + userId);
-
         getVehicles(userId);
 
         listViewVehicles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                selectedItem = position;
+                selectedItem = vehicles.get(position).getId();
                 adapter.notifyDataSetChanged();
 
                 String registration = vehicles.get(position).getRegistration();
                 String model = vehicles.get(position).getModel();
                 openEditVehicle(vehicles.get(position).getId(), position, model, registration);
 
+                //Salvar o veiculo selecionado
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putInt("vehicleId", vehicles.get(position).getId());
+                editor.putString("vehicleRegistration", vehicles.get(position).getRegistration());
+                editor.apply();
             }
         });
 
@@ -107,8 +115,6 @@ public class VehiclesScreen extends AppCompatActivity {
                                     vehicles.add(new Vehicle(data.getInt("vehicle_id"), data.getString("vehicle_model"), data.getString("vehicle_registration"), data.getInt("vehicle_type")));
 
                                 }
-
-                                System.out.println("sizeVehicles: " + vehicles.size());
 
                                 if (!vehicles.isEmpty()) {
 
@@ -150,6 +156,8 @@ public class VehiclesScreen extends AppCompatActivity {
     }
 
     public void closeVehicles(View view) {
+        Intent intent = new Intent(VehiclesScreen.this, MapScreen.class);
+        startActivity(intent);
         finish();
     }
 
@@ -180,7 +188,7 @@ public class VehiclesScreen extends AppCompatActivity {
                 String inputModel = vehicleModel.getText().toString();
                 String inputRegistration = vehicleRegistration.getText().toString();
 
-                if (selectedType != 0 && !inputModel.isEmpty() && !inputRegistration.isEmpty()) {
+                if (!inputModel.isEmpty() && !inputRegistration.isEmpty()) {
 
                     editVehicle(id, position, inputModel, inputRegistration);
                     bottomSheetDialog.dismiss();
@@ -228,7 +236,7 @@ public class VehiclesScreen extends AppCompatActivity {
                         if (response != null) {
 
                             vehicles.get(position).setModel(vehicleModel);
-                            vehicles.get(position).setModel(vehicleRegistration);
+                            vehicles.get(position).setRegistration(vehicleRegistration);
                             adapter.notifyDataSetChanged();
 
                         }
@@ -258,7 +266,7 @@ public class VehiclesScreen extends AppCompatActivity {
                             vehicles.remove(position);
                             adapter.notifyDataSetChanged();
 
-                            if (vehicles.size() == 0) {
+                            if (vehicles.isEmpty()) {
                                 listViewVehicles.setVisibility(View.INVISIBLE);
                                 boxNoVehicles.setVisibility(View.VISIBLE);
                             }
@@ -443,7 +451,8 @@ public class VehiclesScreen extends AppCompatActivity {
             myMatricula.setText(vehicles.get(position).getRegistration());
             myModelo.setText(vehicles.get(position).getModel());
 
-            if (position == selectedItem) {
+
+            if (vehicles.get(position).getId() == selectedItem) {
 
                 myCardVehicle.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
                 myModelo.setTextColor(getResources().getColor(R.color.colorAccent));

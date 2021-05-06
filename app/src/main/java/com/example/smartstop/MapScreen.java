@@ -11,6 +11,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
@@ -125,7 +126,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
     private RequestQueue requestQueue;
 
-    private TextView inputSearchPark;
+    private TextView inputSearchPark, vehicleRegistration;
 
     public static JSONObject USER_JSON_OBJECT;
 
@@ -163,6 +164,14 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                 openSearchPark();
             }
         });
+
+        vehicleRegistration = findViewById(R.id.vehicle_registration);
+
+        //get stored vehicle
+        SharedPreferences settings = getApplicationContext().getSharedPreferences("smartstop", 0);
+        int vehicleId = settings.getInt("vehicleId", 0);
+        String vehicleR = settings.getString("vehicleRegistration", "");
+        vehicleRegistration.setText(vehicleR);
 
         turnOnGPS();
 
@@ -835,6 +844,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     public void openVehicles(View view) {
         Intent intent = new Intent(MapScreen.this, VehiclesScreen.class);
         startActivity(intent);
+        finish();
     }
 
     @Override
