@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.ApiException;
@@ -81,6 +82,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -133,6 +135,9 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     // Variables needed to listen to location updates
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
+    private String host = "10.72.122.13";
+    private int vehicleSelectedId = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,7 +174,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
         //get stored vehicle
         SharedPreferences settings = getApplicationContext().getSharedPreferences("smartstop", 0);
-        int vehicleId = settings.getInt("vehicleId", 0);
+        vehicleSelectedId = settings.getInt("vehicleId", 0);
         String vehicleR = settings.getString("vehicleRegistration", "");
         vehicleRegistration.setText(vehicleR);
 
@@ -193,7 +198,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                         List<Feature> markerCoordinates = new ArrayList<>();
 
-                        String url = "http://192.168.1.4:3000/api/parks";
+                        String url = "http://"+host+":3000/api/parks";
 
                         StringRequest request = new StringRequest(Request.Method.GET, url,
                                 new com.android.volley.Response.Listener<String>() {
@@ -521,7 +526,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         contact = bottomSheetView.findViewById(R.id.park_contact);
         full_address = bottomSheetView.findViewById(R.id.park_fullAddress);
 
-        String url = "http://192.168.1.4:3000/api/parks/"+id;
+        String url = "http://"+host+":3000/api/parks/"+id;
 
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new com.android.volley.Response.Listener<String>() {
@@ -620,6 +625,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                 //Enviar as informações do parque para o outro dialog
                 JSONObject info = new JSONObject();
                 try {
+                    info.put("id", id);
                     info.put("name", name.getText().toString());
                     info.put("spots", total_spots.getText().toString());
                     info.put("address", address.getText().toString());
@@ -778,6 +784,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         p_price = bottomSheetView.findViewById(R.id.park_price);
 
         String fullAddress = "";
+        int id = 0;
 
         try {
             p_name.setText(info.getString("name"));
@@ -785,6 +792,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             p_spots.setText(info.getString("spots"));
             p_price.setText(info.getString("price"));
             fullAddress = info.getString("full_address");
+            id = info.getInt("id");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -808,22 +816,61 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         });
 
         final String fullAddressFinal = fullAddress;
+        final int park_Id = id;
         bottomSheetView.findViewById(R.id.btn_pay).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //Verificar se está tudo preenchido
-                if (startDate.getText() != "" && startHour.getText() != "" && d.getText() != "") {
+                String sd = startDate.getText().toString();
+                String sh = startHour.getText().toString();
+                String fd = d.getText().toString();
+                String dateFrom = sd + " " + sh;
 
-                    bottomSheetDialog.dismiss();
-                    Intent intent = new Intent(MapScreen.this, ParkingCodeScreen.class);
-                    intent.putExtra("DateFrom", startDate.getText() + " " + startHour.getText());
-                    intent.putExtra("Duration", d.getText());
-                    intent.putExtra("Address", fullAddressFinal);
-                    startActivity(intent);
+                if (vehicleSelectedId != 0) { //Verifica se tem um veiculo selecionado
+
+                    //Verificar se está tudo preenchido
+                    if (!sd.isEmpty() && !sh.isEmpty() && !fd.isEmpty()) {
+
+                        bottomSheetDialog.dismiss();
+
+                        Calendar calendar = Calendar.getInstance();
+
+                        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+                        try {
+                            Date d = df.parse(dateFrom);
+                            calendar.setTime(d);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        String[] durationSplit = fd.replace("h", "").replace("m", "").split(" ");
+
+                        int hour = Integer.parseInt(durationSplit[0]);
+                        int minutes = Integer.parseInt(durationSplit[1]);
+
+                        calendar.add(Calendar.HOUR_OF_DAY, hour);
+                        calendar.add(Calendar.MINUTE, minutes);
+
+                        String dateUntil = df.format(calendar.getTime());
+
+                        try {
+                            bookPlace(park_Id, dateFrom, dateUntil);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        Intent intent = new Intent(MapScreen.this, ParkingCodeScreen.class);
+                        intent.putExtra("DateFrom", dateFrom);
+                        intent.putExtra("Duration", dateUntil);
+                        intent.putExtra("Address", fullAddressFinal);
+                        startActivity(intent);
+
+                    } else {
+                        Toast.makeText(MapScreen.this, "Please select a date and duration!", Toast.LENGTH_SHORT).show();
+                    }
 
                 } else {
-                    Toast.makeText(MapScreen.this, "Please select a date and duration!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MapScreen.this, "Please select a vehicle first!", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -831,6 +878,43 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
+
+    }
+
+    public void bookPlace(int id, String startDate, String finalDate) throws ParseException {
+
+        String url = "http://"+host+":3000/api/parks/reservations/new";
+
+        Date date1 = new SimpleDateFormat("dd-MM-yyyy HH:mm").parse(startDate);
+        Date date2 = new SimpleDateFormat("dd-MM-yyyy HH:mm").parse(finalDate);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("park_id", id);
+            jsonObject.put("last_day", simpleDateFormat.format(date2));
+            jsonObject.put("start_day", simpleDateFormat.format(date1));
+            jsonObject.put("payment_method", 2);
+            jsonObject.put("vehicle_id", vehicleSelectedId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request_json = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                new com.android.volley.Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        requestQueue.add(request_json);
 
     }
 

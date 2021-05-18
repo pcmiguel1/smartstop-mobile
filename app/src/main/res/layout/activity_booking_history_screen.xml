@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    tools:context=".BookingHistoryScreen">
+
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Booking History"
+            android:fontFamily="@font/montserratregular"
+            android:textSize="25dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_centerInParent="true"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/close"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:onClick="closeHistory" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/navbar"
+        android:layout_below="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:weightSum="3">
+        
+        <TextView
+            android:id="@+id/active"
+            android:onClick="BookingActive"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="ACTIVE"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/scheduled"
+            android:onClick="BookingScheduled"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="SCHEDULED"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:id="@+id/expired"
+            android:onClick="BookingExpired"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="EXPIRED"
+            android:textAlignment="center"/>
+        
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_below="@id/navbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    
+
+</RelativeLayout>

@@ -29,6 +29,8 @@ public class TokenScreen extends AppCompatActivity {
     private EditText inputToken1, inputToken2, inputToken3, inputToken4;
     private ProgressBar progress_verify;
 
+    private String host = "10.72.122.13";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,7 +121,7 @@ public class TokenScreen extends AppCompatActivity {
 
                 RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-                String url = "http://192.168.1.4:3000/api/users/verify";
+                String url = "http://"+host+":3000/api/users/verify";
 
                 JSONObject jsonObject = new JSONObject();
                 try {

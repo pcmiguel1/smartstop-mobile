@@ -53,6 +53,8 @@ public class VehiclesScreen extends AppCompatActivity {
     private int selectedType = 0;
     private int userId;
 
+    private String host = "10.72.122.13";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +101,10 @@ public class VehiclesScreen extends AppCompatActivity {
 
     private void getVehicles(int id) {
 
-        String url = "http://192.168.1.4:3000/api/users/"+id+"/vehicles";
+        String url = "http://"+host+":3000/api/users/"+id+"/vehicles";
+
+        adapter = new MyAdapter(VehiclesScreen.this, tipos, vehicles);
+        listViewVehicles.setAdapter(adapter);
 
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new com.android.volley.Response.Listener<String>() {
@@ -120,8 +125,6 @@ public class VehiclesScreen extends AppCompatActivity {
 
                                     listViewVehicles.setVisibility(View.VISIBLE);
                                     boxNoVehicles.setVisibility(View.INVISIBLE);
-                                    adapter = new MyAdapter(VehiclesScreen.this, tipos, vehicles);
-                                    listViewVehicles.setAdapter(adapter);
 
                                 }
 
@@ -218,7 +221,7 @@ public class VehiclesScreen extends AppCompatActivity {
 
     private void editVehicle(int id, int position, String vehicleModel, String vehicleRegistration) {
 
-        String url = "http://192.168.1.4:3000/api/vehicles/"+id+"/edit";
+        String url = "http://"+host+":3000/api/vehicles/"+id+"/edit";
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -255,7 +258,7 @@ public class VehiclesScreen extends AppCompatActivity {
 
     private void deleteVehicle(int id, int position) {
 
-        String url = "http://192.168.1.4:3000/api/vehicles/"+id+"/delete";
+        String url = "http://"+host+":3000/api/vehicles/"+id+"/delete";
 
         StringRequest request = new StringRequest(Request.Method.DELETE, url,
                 new com.android.volley.Response.Listener<String>() {
@@ -384,7 +387,7 @@ public class VehiclesScreen extends AppCompatActivity {
 
     private void addVehicle(String model, String registration) {
 
-        String url = "http://192.168.1.4:3000/api/users/"+userId+"/vehicles/new";
+        String url = "http://"+host+":3000/api/users/"+userId+"/vehicles/new";
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -405,11 +408,10 @@ public class VehiclesScreen extends AppCompatActivity {
 
                             try {
                                 vehicles.add(new Vehicle(response.getInt("insertId"), model, registration, selectedType));
+                                adapter.notifyDataSetChanged();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
-                            adapter.notifyDataSetChanged();
 
                         }
 

@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".RecoverScreen"></activity>
+        <activity android:name=".BookingHistoryScreen"></activity>
+        <activity android:name=".RecoverScreen" />
         <activity android:name=".TokenScreen" />
         <activity android:name=".ParkingCodeScreen" />
         <activity android:name=".RegisterScreen" />

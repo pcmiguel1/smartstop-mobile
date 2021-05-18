@@ -27,6 +27,8 @@ public class RegisterScreen extends AppCompatActivity {
     private EditText inputFullName, inputEmail, inputPassword, inputConfirmPassword;
     private ProgressBar progressBar;
 
+    private String host = "10.72.122.13";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +64,7 @@ public class RegisterScreen extends AppCompatActivity {
 
                 RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-                String url = "http://192.168.1.4:3000/api/users";
+                String url = "http://"+host+":3000/api/users";
 
                 JSONObject jsonObject = new JSONObject();
                 try {

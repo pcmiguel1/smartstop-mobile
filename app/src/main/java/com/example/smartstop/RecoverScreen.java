@@ -27,6 +27,8 @@ public class RecoverScreen extends AppCompatActivity {
     private EditText inputEmail;
     private ProgressBar progressBar;
 
+    private String host = "10.72.122.13";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +53,7 @@ public class RecoverScreen extends AppCompatActivity {
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-            String url = "http://192.168.1.4:3000/api/users/recover";
+            String url = "http://"+host+":3000/api/users/recover";
 
             JSONObject jsonObject = new JSONObject();
             try {

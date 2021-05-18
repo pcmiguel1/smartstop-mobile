@@ -49,30 +49,11 @@ public class ParkingCodeScreen extends AppCompatActivity {
         }
 
         if (getIntent().hasExtra("DateFrom")) {
-            String dateFrom = getIntent().getStringExtra("DateFrom");
-            parkDateFrom.setText(dateFrom);
+            parkDateFrom.setText(getIntent().getStringExtra("DateFrom"));
 
             if (getIntent().hasExtra("Duration")) {
 
-                Calendar calendar = Calendar.getInstance();
-
-                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-                try {
-                    Date d = df.parse(dateFrom);
-                    calendar.setTime(d);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                String[] durationSplit = getIntent().getStringExtra("Duration").replace("h", "").replace("m", "").split(" ");
-
-                int hour = Integer.parseInt(durationSplit[0]);
-                int minutes = Integer.parseInt(durationSplit[1]);
-
-                calendar.add(Calendar.HOUR_OF_DAY, hour);
-                calendar.add(Calendar.MINUTE, minutes);
-
-                parkDateTo.setText(df.format(calendar.getTime()));
+                parkDateTo.setText(getIntent().getStringExtra("Duration"));
 
             }
 

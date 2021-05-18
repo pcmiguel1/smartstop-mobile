@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:text="Rua Castilho, 1250-048"
                 android:textColor="@color/colorGray"
-                android:textSize="15dp"
+                android:textSize="13dp"
                 android:fontFamily="@font/montserratregular"/>
 
             <LinearLayout
