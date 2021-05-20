@@ -135,7 +135,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     // Variables needed to listen to location updates
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
-    private String host = "10.72.122.13";
+    private String host = "192.168.1.4";
     private int vehicleSelectedId = 0;
 
     @Override
@@ -895,7 +895,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             jsonObject.put("park_id", id);
             jsonObject.put("last_day", simpleDateFormat.format(date2));
             jsonObject.put("start_day", simpleDateFormat.format(date1));
-            jsonObject.put("payment_method", 2);
+            jsonObject.put("payment_method", 3);
             jsonObject.put("vehicle_id", vehicleSelectedId);
         } catch (JSONException e) {
             e.printStackTrace();

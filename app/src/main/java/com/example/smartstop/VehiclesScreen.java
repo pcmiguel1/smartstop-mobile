@@ -53,7 +53,7 @@ public class VehiclesScreen extends AppCompatActivity {
     private int selectedType = 0;
     private int userId;
 
-    private String host = "10.72.122.13";
+    private String host = "192.168.1.4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +120,8 @@ public class VehiclesScreen extends AppCompatActivity {
                                     vehicles.add(new Vehicle(data.getInt("vehicle_id"), data.getString("vehicle_model"), data.getString("vehicle_registration"), data.getInt("vehicle_type")));
 
                                 }
+
+                                adapter.notifyDataSetChanged();
 
                                 if (!vehicles.isEmpty()) {
 

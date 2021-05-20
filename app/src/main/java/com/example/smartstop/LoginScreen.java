@@ -28,7 +28,7 @@ public class LoginScreen extends AppCompatActivity {
     private ProgressBar progressBar;
     private EditText inputEmail, inputPassword;
 
-    private String host = "10.72.122.13";
+    private String host = "192.168.1.4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

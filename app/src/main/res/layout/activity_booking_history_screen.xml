@@ -77,10 +77,12 @@
         
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_below="@id/navbar"
+    <ListView
+        android:padding="20dp"
+        android:id="@+id/listView_books"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@+id/navbar" />
     
 
 </RelativeLayout>
