@@ -178,9 +178,11 @@ public class BookingHistoryScreen extends AppCompatActivity {
             View row = layoutInflater.inflate(R.layout.row_book, parent, false);
             TextView myMatricula = row.findViewById(R.id.car_registration);
             TextView myTime = row.findViewById(R.id.time_left);
+            TextView info = row.findViewById(R.id.info_booking);
 
             myMatricula.setText(reservations.get(position).getVehicleRegistration());
             String lastDay = reservations.get(position).getReservationLastDay();
+            String startDay = reservations.get(position).getReservationStartDay();
 
             long duration = 0;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -188,7 +190,18 @@ public class BookingHistoryScreen extends AppCompatActivity {
             try {
                 Date date1 = new Date();
                 Date date2 = sdf.parse(lastDay);
-                duration =  date2.getTime() - date1.getTime();
+                Date date3 = sdf.parse(startDay);
+                if (history.equals("scheduled")) {
+                    info.setText("Ative when");
+                    duration =  date3.getTime() - date1.getTime();
+                }
+                else if (history.equals("expired")) {
+                    info.setText("Reservation expired");
+                    myTime.setText("00h 00m 00s");
+                }
+                else {
+                    duration =  date2.getTime() - date1.getTime();
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
             }

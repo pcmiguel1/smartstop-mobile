@@ -13,7 +13,8 @@
         app:cardCornerRadius="20dp"
         android:backgroundTint="@color/colorAccent"
         android:elevation="1dp"
-        android:layout_marginBottom="20dp">
+        android:layout_marginBottom="20dp"
+        app:cardUseCompatPadding="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -56,6 +57,7 @@
                 >
 
                 <TextView
+                    android:id="@+id/info_booking"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Time Left"
