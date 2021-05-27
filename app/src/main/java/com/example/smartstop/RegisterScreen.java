@@ -27,7 +27,7 @@ public class RegisterScreen extends AppCompatActivity {
     private EditText inputFullName, inputEmail, inputPassword, inputConfirmPassword;
     private ProgressBar progressBar;
 
-    private String host = "192.168.1.4";
+    private String host = MainActivity.HOST;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

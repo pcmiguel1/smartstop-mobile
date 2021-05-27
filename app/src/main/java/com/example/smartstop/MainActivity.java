@@ -10,6 +10,7 @@ import android.view.WindowManager;
 public class MainActivity extends AppCompatActivity {
 
     private static int SPLASH_SCREEN = 5000;
+    public static String HOST = "192.168.1.4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

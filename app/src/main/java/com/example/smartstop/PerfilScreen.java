@@ -35,4 +35,10 @@ public class PerfilScreen extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    public void openPaymentMethods(View view) {
+        Intent intent = new Intent(PerfilScreen.this, PaymentsScreen.class);
+        startActivity(intent);
+        finish();
+    }
 }

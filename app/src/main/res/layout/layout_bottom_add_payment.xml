@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomSheetPayment"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_background"
+    android:paddingHorizontal="20dp"
+    android:orientation="vertical">
+    
+    <androidx.cardview.widget.CardView
+        android:layout_width="45dp"
+        android:layout_height="5dp"
+        android:backgroundTint="#D2D2D2"
+        android:layout_marginTop="10dp"
+        app:cardCornerRadius="20dp"
+        android:layout_gravity="center_horizontal"
+        app:cardElevation="0dp"
+        />
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Payment Method"
+        android:fontFamily="@font/montserratregular"
+        android:textSize="25sp"
+        android:textColor="@color/colorPrimaryDark"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="13dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/custom_button"
+        android:backgroundTint="#EDF2F7"
+        android:gravity="center_vertical">
+        
+        <ImageView
+            android:id="@+id/img_payment_type"
+            android:layout_marginLeft="10dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/visa_150px"/>
+
+        <EditText
+            android:layout_marginRight="10dp"
+            android:id="@+id/card_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"
+            android:textCursorDrawable="@null"
+            android:hint="Card Number"
+            android:textColorHint="#777777"
+            android:fontFamily="@font/montserratregular"
+            android:inputType="number"
+            android:imeOptions="actionNext"
+            android:layout_marginLeft="10dp"
+            android:maxLength="16"
+            android:background="@android:color/transparent"/>
+        
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <EditText
+            android:focusable="false"
+            android:id="@+id/expiration_date"
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"
+            android:textCursorDrawable="@null"
+            android:hint="Expiration Date"
+            android:textColorHint="#777777"
+            android:fontFamily="@font/montserratregular"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="#EDF2F7"
+            android:padding="15dp"
+            android:layout_marginTop="20dp"
+            android:imeOptions="actionNext" />
+
+        <EditText
+            android:id="@+id/cvv"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"
+            android:textCursorDrawable="@null"
+            android:hint="CVV"
+            android:textColorHint="#777777"
+            android:fontFamily="@font/montserratregular"
+            android:background="@drawable/custom_button"
+            android:backgroundTint="#EDF2F7"
+            android:padding="15dp"
+            android:layout_marginTop="20dp"
+            android:inputType="number"
+            android:imeOptions="actionNext"
+            android:layout_marginLeft="15dp"
+            android:maxLength="3" />
+
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/cardholder_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="18dp"
+        android:textCursorDrawable="@null"
+        android:hint="Cardholder Name"
+        android:textColorHint="#777777"
+        android:fontFamily="@font/montserratregular"
+        android:background="@drawable/custom_button"
+        android:backgroundTint="#EDF2F7"
+        android:padding="15dp"
+        android:layout_marginTop="20dp"
+        android:inputType="text"
+        android:imeOptions="actionDone"/>
+
+    <LinearLayout
+        android:id="@+id/btn_confirm_add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/custom_button"
+        android:padding="10dp"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confirm"
+            android:textColor="@color/colorPrimaryDark"
+            android:fontFamily="@font/montserratsemibold"
+            android:textSize="20dp"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

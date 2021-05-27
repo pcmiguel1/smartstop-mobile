@@ -135,7 +135,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     // Variables needed to listen to location updates
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
-    private String host = "192.168.1.4";
+    private String host = MainActivity.HOST;
     private int vehicleSelectedId = 0;
 
     @Override

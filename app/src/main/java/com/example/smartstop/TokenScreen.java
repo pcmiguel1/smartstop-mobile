@@ -29,7 +29,7 @@ public class TokenScreen extends AppCompatActivity {
     private EditText inputToken1, inputToken2, inputToken3, inputToken4;
     private ProgressBar progress_verify;
 
-    private String host = "192.168.1.4";
+    private String host = MainActivity.HOST;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

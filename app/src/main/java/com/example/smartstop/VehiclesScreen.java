@@ -53,7 +53,7 @@ public class VehiclesScreen extends AppCompatActivity {
     private int selectedType = 0;
     private int userId;
 
-    private String host = "192.168.1.4";
+    private String host = MainActivity.HOST;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
