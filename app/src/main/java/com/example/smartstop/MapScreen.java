@@ -21,11 +21,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
@@ -81,6 +84,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -196,78 +200,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                         mapboxMap.getUiSettings().setLogoEnabled(false);
                         enableLocationComponent(style);
 
-                        List<Feature> markerCoordinates = new ArrayList<>();
-
-                        String url = "http://"+host+":3000/api/parks";
-
-                        StringRequest request = new StringRequest(Request.Method.GET, url,
-                                new com.android.volley.Response.Listener<String>() {
-                                    @Override
-                                    public void onResponse(String response) {
-
-                                        if (response != null) {
-                                            try {
-                                                JSONArray jsonArray = new JSONArray(response);
-                                                for (int i = 0; i < jsonArray.length(); i++) {
-                                                    JSONObject data = jsonArray.getJSONObject(i);
-
-                                                    Feature feature = Feature.fromGeometry(Point.fromLngLat(data.getDouble("park_longitude"), data.getDouble("park_latitude")));
-                                                    feature.addStringProperty("PARK_PRICE", data.getDouble("park_price_hour") + "€");
-                                                    feature.addNumberProperty("PARK_ID", data.getInt("park_id"));
-                                                    feature.addStringProperty("PARK_LAT", data.getString("park_latitude"));
-                                                    feature.addStringProperty("PARK_LNT", data.getString("park_longitude"));
-                                                    markerCoordinates.add(feature);
-
-                                                }
-
-                                                style.addSource(new GeoJsonSource("marker-source",
-                                                        FeatureCollection.fromFeatures(markerCoordinates)));
-
-                                                //Add the marker image to map
-                                                style.addImage("marker-park-price", BitmapFactory.decodeResource(
-                                                        MapScreen.this.getResources(), R.drawable.marker));
-
-                                                // Adding an offset so that the bottom of the blue icon gets fixed to the coordinate, rather than the
-                                                // middle of the icon being fixed to the coordinate point.
-                                                style.addLayer(new SymbolLayer("marker-layer", "marker-source")
-                                                        .withProperties(PropertyFactory.iconImage("marker-park-price"),
-                                                                iconAllowOverlap(true),
-                                                                textField(Expression.get("PARK_PRICE")),
-                                                                textColor("#FFF"),
-                                                                textFont(new String[] {"Montserrat Regular"}),
-                                                                textSize(15f)));
-
-                                                style.addSource(new GeoJsonSource("selected-marker"));
-
-                                                //Add the marker image to map
-                                                style.addImage("marker-park-selected", BitmapFactory.decodeResource(
-                                                        MapScreen.this.getResources(), R.drawable.marker2));
-
-                                                // Adding an offset so that the bottom of the blue icon gets fixed to the coordinate, rather than the
-                                                // middle of the icon being fixed to the coordinate point.
-                                                style.addLayer(new SymbolLayer("selected-marker-layer", "selected-marker")
-                                                        .withProperties(PropertyFactory.iconImage("marker-park-selected"),
-                                                                iconAllowOverlap(true),
-                                                                textField("P"),
-                                                                textColor("#000"),
-                                                                textFont(new String[] {"Montserrat ExtraBold"}),
-                                                                textSize(29f)));
-
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-
-                                        }
-
-                                    }
-                                }, new com.android.volley.Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Toast.makeText(MapScreen.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        requestQueue.add(request);
+                        addParksMap("", "");
 
                         mapboxMap.addOnMapClickListener(MapScreen.this);
 
@@ -277,6 +210,120 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                     }
                 });
+    }
+
+    private void addParksMap(String name, String features) {
+
+        Style style = mapboxMap.getStyle();
+
+        List<Feature> markerCoordinates = new ArrayList<>();
+        style.removeLayer("marker-layer");
+        style.removeLayer("selected-marker-layer");
+        style.removeSource("marker-source");
+        style.removeSource("selected-marker");
+        style.removeImage("marker-park-price");
+        style.removeImage("marker-park-selected");
+
+        markerCoordinates.clear();
+
+        String url = "http://"+host+":3000/api/parks";
+        if (!name.isEmpty() && features.isEmpty()) {
+            url = "http://"+host+":3000/api/parks?park_name="+name;
+        }
+        if (!name.isEmpty() && !features.isEmpty()) {
+            url = "http://"+host+":3000/api/parks?park_name="+name+"&features="+features;
+        }
+        if (name.isEmpty() && !features.isEmpty()) {
+            url = "http://"+host+":3000/api/parks?features="+features;
+        }
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                new com.android.volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        if (response != null) {
+                            try {
+                                JSONArray jsonArray = new JSONArray(response);
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject data = jsonArray.getJSONObject(i);
+
+                                    Feature feature = Feature.fromGeometry(Point.fromLngLat(data.getDouble("park_longitude"), data.getDouble("park_latitude")));
+                                    feature.addStringProperty("PARK_PRICE", data.getDouble("park_price_hour") + "€");
+                                    feature.addNumberProperty("PARK_ID", data.getInt("park_id"));
+                                    feature.addStringProperty("PARK_LAT", data.getString("park_latitude"));
+                                    feature.addStringProperty("PARK_LNT", data.getString("park_longitude"));
+                                    markerCoordinates.add(feature);
+
+                                }
+
+                                style.addSource(new GeoJsonSource("marker-source",
+                                        FeatureCollection.fromFeatures(markerCoordinates)));
+
+                                //Add the marker image to map
+                                style.addImage("marker-park-price", BitmapFactory.decodeResource(
+                                        MapScreen.this.getResources(), R.drawable.marker));
+
+                                // Adding an offset so that the bottom of the blue icon gets fixed to the coordinate, rather than the
+                                // middle of the icon being fixed to the coordinate point.
+                                style.addLayer(new SymbolLayer("marker-layer", "marker-source")
+                                        .withProperties(PropertyFactory.iconImage("marker-park-price"),
+                                                iconAllowOverlap(true),
+                                                textField(Expression.get("PARK_PRICE")),
+                                                textColor("#FFF"),
+                                                textFont(new String[] {"Montserrat Regular"}),
+                                                textSize(15f)));
+
+                                style.addSource(new GeoJsonSource("selected-marker"));
+
+                                //Add the marker image to map
+                                style.addImage("marker-park-selected", BitmapFactory.decodeResource(
+                                        MapScreen.this.getResources(), R.drawable.marker2));
+
+                                // Adding an offset so that the bottom of the blue icon gets fixed to the coordinate, rather than the
+                                // middle of the icon being fixed to the coordinate point.
+                                style.addLayer(new SymbolLayer("selected-marker-layer", "selected-marker")
+                                        .withProperties(PropertyFactory.iconImage("marker-park-selected"),
+                                                iconAllowOverlap(true),
+                                                textField("P"),
+                                                textColor("#000"),
+                                                textFont(new String[] {"Montserrat ExtraBold"}),
+                                                textSize(29f)));
+
+                                Toast.makeText(MapScreen.this, markerCoordinates.size() + " parks found!", Toast.LENGTH_LONG).show();
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                if (networkResponse != null) {
+                    int status = networkResponse.statusCode;
+                    if (status == 404) {
+                        try {
+                            String responseBody = new String(error.networkResponse.data, "utf-8");
+                            JSONObject data = new JSONObject(responseBody);
+                            String message = data.optString("msg");
+                            Toast.makeText(MapScreen.this, message, Toast.LENGTH_LONG).show();
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+        });
+
+        requestQueue.add(request);
+
     }
 
     @Override
@@ -472,6 +519,8 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
     private void openSearchPark() {
 
+        ArrayList<Integer> features = new ArrayList<>();
+
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
                 MapScreen.this, R.style.BottomSheetDialogTheme
         );
@@ -480,6 +529,26 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                         R.layout.layout_bottom_search_park,
                         (LinearLayout) findViewById(R.id.bottomSheetParkInfo)
                 );
+
+        EditText inputSearch = bottomSheetView.findViewById(R.id.input_search_park);
+        ImageView btnSearch = bottomSheetView.findViewById(R.id.btn_search_park);
+
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String search = inputSearch.getText().toString();
+
+                String parkFeatures = features.toString().replace("[", "").replace("]", "");
+
+                addParksMap(search, parkFeatures);
+                if (!search.isEmpty()) {
+                    inputSearchPark.setText(search);
+                }
+                bottomSheetDialog.dismiss();
+
+            }
+        });
 
         //List type parking
         RecyclerView recyclerView = bottomSheetView.findViewById(R.id.list_type_parking);
@@ -492,7 +561,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
         //List Parking features
         RecyclerView recyclerView2 = bottomSheetView.findViewById(R.id.list_features_parking);
-        FeatureParkingAdapter featureParkingAdapter = new FeatureParkingAdapter(this);
+        FeatureParkingAdapter featureParkingAdapter = new FeatureParkingAdapter(this, features);
 
         RecyclerView.LayoutManager layoutManager2 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView2.setLayoutManager(layoutManager2);
@@ -815,6 +884,16 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             }
         });
 
+        bottomSheetDialog.findViewById(R.id.btn_payment_method).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(MapScreen.this, PaymentsScreen.class);
+                startActivity(intent);
+
+            }
+        });
+
         final String fullAddressFinal = fullAddress;
         final int park_Id = id;
         bottomSheetView.findViewById(R.id.btn_pay).setOnClickListener(new View.OnClickListener() {
@@ -883,7 +962,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
     public void bookPlace(int id, String startDate, String finalDate) throws ParseException {
 
-        String url = "http://"+host+":3000/api/parks/reservations/new";
+        String url = "http://"+host+":3000/api/parks/"+id+"/reservations/new";
 
         Date date1 = new SimpleDateFormat("dd-MM-yyyy HH:mm").parse(startDate);
         Date date2 = new SimpleDateFormat("dd-MM-yyyy HH:mm").parse(finalDate);
@@ -892,7 +971,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("park_id", id);
             jsonObject.put("last_day", simpleDateFormat.format(date2));
             jsonObject.put("start_day", simpleDateFormat.format(date1));
             jsonObject.put("payment_method", 3);

@@ -183,7 +183,7 @@
                     android:id="@+id/input_search_park"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Parking address..."
+                    android:text="Park name..."
                     android:textColor="@color/colorGray"
                     android:textColorHint="@color/colorGray"
                     android:fontFamily="@font/montserratregular"

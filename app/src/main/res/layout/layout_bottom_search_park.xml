@@ -47,7 +47,7 @@
                     android:id="@+id/input_search_park"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Parking address..."
+                    android:hint="Park name..."
                     android:textColor="@color/colorGray"
                     android:textColorHint="@color/colorGray"
                     android:fontFamily="@font/montserratregular"
@@ -61,6 +61,7 @@
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/btn_search_park"
                 android:layout_toRightOf="@+id/layout_search"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
