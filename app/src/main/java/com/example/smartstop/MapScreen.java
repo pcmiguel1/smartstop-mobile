@@ -610,7 +610,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                                 String open_hour = jsonObject.getString("park_hour_open");
 
                                 name.setText(jsonObject.getString("park_name"));
-                                total_spots.setText(jsonObject.getString("park_spots")+" spots");
+                                total_spots.setText(jsonObject.getString("park_free_spots")+" spots");
                                 price.setText(jsonObject.getString("park_price_hour")+"/h");
                                 hours.setText(open_hour + " - " + close_hour);
 
@@ -884,7 +884,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             }
         });
 
-        bottomSheetDialog.findViewById(R.id.btn_payment_method).setOnClickListener(new View.OnClickListener() {
+        bottomSheetView.findViewById(R.id.btn_payment_method).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
