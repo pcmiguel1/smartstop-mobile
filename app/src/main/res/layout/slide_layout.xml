@@ -27,8 +27,8 @@
         <ImageView
             android:id="@+id/slide_image"
             android:layout_width="330dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/slide1"
+            android:layout_height="400dp"
+            android:src="@drawable/mockupmap"
             android:adjustViewBounds="true"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"

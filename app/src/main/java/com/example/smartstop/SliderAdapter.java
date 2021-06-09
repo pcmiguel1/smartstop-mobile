@@ -22,25 +22,31 @@ public class SliderAdapter extends PagerAdapter {
 
     public int[] slide_images = {
 
-            R.drawable.slide1,
-            R.drawable.slide1,
-            R.drawable.slide1
+            R.drawable.mockupmap,
+            R.drawable.mockuppark2,
+            R.drawable.mockuppark1,
+            R.drawable.mockupreservation,
+            R.drawable.mockuphistory
 
     };
 
     public String[] slide_headings = {
 
             "Parking just got easier",
-            "aksksak",
-            "ajkdkfkfdk"
+            "Park information",
+            "Make a reservation",
+            "Booking information",
+            "All reservations made"
 
     };
 
     public String[] slide_descs = {
 
             "Simpler, safer and complete. Without wasting time find a place, book now parking place.",
-            "Simpler, safer and complete. Without wasting time find a place, book now parking place.",
-            "Simpler, safer and complete. Without wasting time find a place, book now parking place."
+            "See all the information about the park and also the route from your location to the selected park.",
+            "To make the reservation you only need to select the duration and the starting date.",
+            "After making the payment, you will be able to see al the information of the reservation made.",
+            "See all reservations that are active, sheduled and expired and also extend or interrupt your parking time at any time."
 
     };
 
