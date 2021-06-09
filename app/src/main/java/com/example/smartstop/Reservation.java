@@ -28,6 +28,10 @@ public class Reservation {
         this.parkSlotNumber = parkSlotNumber;
     }
 
+    public void setReservationLastDay(String reservationLastDay) {
+        this.reservationLastDay = reservationLastDay;
+    }
+
     public int getReservationId() {
         return reservationId;
     }

@@ -55,6 +55,7 @@
                     android:layout_marginLeft="10dp"
                     android:background="@android:color/transparent"
                     android:layout_gravity="center"
+                    android:imeOptions="actionDone"
                     />
 
 

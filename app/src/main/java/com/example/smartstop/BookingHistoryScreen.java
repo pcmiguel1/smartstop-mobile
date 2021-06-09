@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -14,14 +15,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -33,6 +39,7 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -179,6 +186,8 @@ public class BookingHistoryScreen extends AppCompatActivity {
             TextView myMatricula = row.findViewById(R.id.car_registration);
             TextView myTime = row.findViewById(R.id.time_left);
             TextView info = row.findViewById(R.id.info_booking);
+            Button extend = row.findViewById(R.id.btn_extend);
+            LinearLayout btnsBook = row.findViewById(R.id.btns_book);
 
             myMatricula.setText(reservations.get(position).getVehicleRegistration());
             String lastDay = reservations.get(position).getReservationLastDay();
@@ -198,6 +207,8 @@ public class BookingHistoryScreen extends AppCompatActivity {
                 else if (history.equals("expired")) {
                     info.setText("Reservation expired");
                     myTime.setText("00h 00m 00s");
+                    extend.setVisibility(View.GONE);
+                    btnsBook.setWeightSum(1);
                 }
                 else {
                     duration =  date2.getTime() - date1.getTime();
@@ -229,6 +240,64 @@ public class BookingHistoryScreen extends AppCompatActivity {
                 }
 
             }.start();
+
+            extend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    final Calendar calendar = Calendar.getInstance();
+
+                    TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+
+                            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+                            SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+                            try {
+                                Date lastDate = df2.parse(reservations.get(position).getReservationLastDay());
+                                calendar.setTime(lastDate);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            calendar.add(Calendar.HOUR_OF_DAY, hourOfDay);
+                            calendar.add(Calendar.MINUTE, minute);
+
+                            String url = "http://"+host+":3000/api/reservations/"+reservations.get(position).getReservationId()+"/extend";
+
+                            JSONObject jsonObject = new JSONObject();
+                            try {
+                                jsonObject.put("last_day", df2.format(calendar.getTime()));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            JsonObjectRequest request_json = new JsonObjectRequest(Request.Method.PUT, url, jsonObject,
+                                    new com.android.volley.Response.Listener<JSONObject>() {
+                                        @Override
+                                        public void onResponse(JSONObject response) {
+                                            Toast.makeText(BookingHistoryScreen.this, "Extended time to: " + df.format(calendar.getTime()), Toast.LENGTH_SHORT).show();
+                                            reservations.get(position).setReservationLastDay(df2.format(calendar.getTime()));
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }, new com.android.volley.Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+
+                                }
+                            });
+
+                            requestQueue.add(request_json);
+
+                        }
+                    };
+
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(BookingHistoryScreen.this, timeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE),true);
+                    timePickerDialog.show();
+
+                }
+            });
 
             return row;
         }
