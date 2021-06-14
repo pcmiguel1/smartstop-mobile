@@ -141,6 +141,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
     private String host = MainActivity.HOST;
     public static int vehicleSelectedId = 0;
+    public static int paymentMethodSelectedId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -878,7 +879,14 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
                         (LinearLayout) findViewById(R.id.bottomSheetBookDetails)
                 );
 
-        TextView startDate, startHour, d, price, p_name, p_address, p_spots, p_price;
+        TextView startDate, startHour, d, price, p_name, p_address, p_spots, p_price, paymentType, paymentNumber;
+        ImageView paymentImage;
+
+        paymentType = bottomSheetView.findViewById(R.id.payment_type);
+        paymentNumber = bottomSheetView.findViewById(R.id.number_payment);
+        paymentImage = bottomSheetView.findViewById(R.id.img_payment_type);
+
+        getFavoritePaymentMethod(paymentType, paymentNumber, paymentImage);
 
         startDate = bottomSheetView.findViewById(R.id.start_date);
         startHour = bottomSheetView.findViewById(R.id.start_hour);
@@ -945,45 +953,52 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
                 if (vehicleSelectedId != 0) { //Verifica se tem um veiculo selecionado
 
-                    //Verificar se está tudo preenchido
-                    if (!sd.isEmpty() && !sh.isEmpty() && !fd.isEmpty()) {
+                    if (paymentMethodSelectedId != 0) { //Verifica se tem um metodo de pagamento selecionado
 
-                        bottomSheetDialog.dismiss();
+                        //Verificar se está tudo preenchido
+                        if (!sd.isEmpty() && !sh.isEmpty() && !fd.isEmpty()) {
 
-                        Calendar calendar = Calendar.getInstance();
+                            bottomSheetDialog.dismiss();
 
-                        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-                        try {
-                            Date d = df.parse(dateFrom);
-                            calendar.setTime(d);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                            Calendar calendar = Calendar.getInstance();
+
+                            SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+                            try {
+                                Date d = df.parse(dateFrom);
+                                calendar.setTime(d);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            String[] durationSplit = fd.replace("h", "").replace("m", "").split(" ");
+
+                            int hour = Integer.parseInt(durationSplit[0]);
+                            int minutes = Integer.parseInt(durationSplit[1]);
+
+                            calendar.add(Calendar.HOUR_OF_DAY, hour);
+                            calendar.add(Calendar.MINUTE, minutes);
+
+                            String dateUntil = df.format(calendar.getTime());
+
+                            try {
+                                bookPlace(park_Id, dateFrom, dateUntil);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            Intent intent = new Intent(MapScreen.this, ParkingCodeScreen.class);
+                            intent.putExtra("DateFrom", dateFrom);
+                            intent.putExtra("Duration", dateUntil);
+                            intent.putExtra("Address", fullAddressFinal);
+                            startActivity(intent);
+
+                        } else {
+                            Toast.makeText(MapScreen.this, "Please select a date and duration!", Toast.LENGTH_SHORT).show();
                         }
 
-                        String[] durationSplit = fd.replace("h", "").replace("m", "").split(" ");
-
-                        int hour = Integer.parseInt(durationSplit[0]);
-                        int minutes = Integer.parseInt(durationSplit[1]);
-
-                        calendar.add(Calendar.HOUR_OF_DAY, hour);
-                        calendar.add(Calendar.MINUTE, minutes);
-
-                        String dateUntil = df.format(calendar.getTime());
-
-                        try {
-                            bookPlace(park_Id, dateFrom, dateUntil);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-
-                        Intent intent = new Intent(MapScreen.this, ParkingCodeScreen.class);
-                        intent.putExtra("DateFrom", dateFrom);
-                        intent.putExtra("Duration", dateUntil);
-                        intent.putExtra("Address", fullAddressFinal);
-                        startActivity(intent);
-
-                    } else {
-                        Toast.makeText(MapScreen.this, "Please select a date and duration!", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Toast.makeText(MapScreen.this, "Please select a payment method first!", Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
@@ -995,6 +1010,55 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
+
+    }
+
+    private void getFavoritePaymentMethod(TextView type, TextView myNumber, ImageView image) {
+
+        String url = null;
+        try {
+            url = "http://"+host+":3000/api/users/"+USER_JSON_OBJECT.getInt("user_id")+"/paymentmethods/favorite";
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                new com.android.volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        if (response != null) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                paymentMethodSelectedId = jsonObject.getInt("payment_method_id");
+
+                                String number = String.valueOf(jsonObject.getInt("payment_method_card_number"));
+
+                                if (number.charAt(0) == '4') { //Visa
+                                    image.setImageResource(R.drawable.visa_150px);
+                                    type.setText("Visa");
+                                } else if (number.charAt(0) == '5') { //Mastercard
+                                    image.setImageResource(R.drawable.mastercard_150px);
+                                    type.setText("Mastercard");
+                                }
+                                myNumber.setText(number.substring(number.length() - 4));
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        requestQueue.add(request);
 
     }
 
@@ -1011,7 +1075,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         try {
             jsonObject.put("last_day", simpleDateFormat.format(date2));
             jsonObject.put("start_day", simpleDateFormat.format(date1));
-            jsonObject.put("payment_method", 3);
+            jsonObject.put("payment_method", paymentMethodSelectedId);
             jsonObject.put("vehicle_id", vehicleSelectedId);
         } catch (JSONException e) {
             e.printStackTrace();

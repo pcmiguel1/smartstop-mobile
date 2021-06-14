@@ -78,7 +78,10 @@ public class PaymentsScreen extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        getFavoritePaymentMethod();
+
         getPaymentMethods();
+        System.out.println("selectedItem: " + selectedItem);
 
         listViewPayments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -86,8 +89,71 @@ public class PaymentsScreen extends AppCompatActivity {
 
                 selectedItem = paymentMethods.get(position).getId();
                 adapter.notifyDataSetChanged();
+
+                //setar o veiculo selecionado como favorito
+                setFavoritePaymentMethod(selectedItem);
             }
         });
+
+    }
+
+    private void getFavoritePaymentMethod() {
+
+        String url = "http://"+host+":3000/api/users/"+userId+"/paymentmethods/favorite";
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                new com.android.volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        if (response != null) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                selectedItem = jsonObject.getInt("payment_method_id");
+                                System.out.println("pila: " + jsonObject);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        requestQueue.add(request);
+
+    }
+
+    private void setFavoritePaymentMethod(int newId) {
+
+        String url = "http://"+host+":3000/api/paymentmethods/"+newId+"/favorite/add";
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("oldId", MapScreen.vehicleSelectedId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request_json = new JsonObjectRequest(Request.Method.PUT, url, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        requestQueue.add(request_json);
 
     }
 
@@ -320,6 +386,11 @@ public class PaymentsScreen extends AppCompatActivity {
             TextView myNumber = row.findViewById(R.id.number_payment);
             CardView myCardPayment = row.findViewById(R.id.card_payment);
 
+            CardView dot1 = row.findViewById(R.id.number_dot1);
+            CardView dot2 = row.findViewById(R.id.number_dot2);
+            CardView dot3 = row.findViewById(R.id.number_dot3);
+            CardView dot4 = row.findViewById(R.id.number_dot4);
+
             String number = String.valueOf(paymentMethods.get(position).getCard_number());
 
             if (number.charAt(0) == '4') { //Visa
@@ -334,6 +405,11 @@ public class PaymentsScreen extends AppCompatActivity {
             if (paymentMethods.get(position).getId() == selectedItem) {
 
                 myCardPayment.setBackgroundTintList(getResources().getColorStateList(R.color.colorPrimary));
+                myNumber.setTextColor(getResources().getColor(R.color.colorAccent));
+                dot1.setBackgroundTintList(getResources().getColorStateList(R.color.colorAccent));
+                dot2.setBackgroundTintList(getResources().getColorStateList(R.color.colorAccent));
+                dot3.setBackgroundTintList(getResources().getColorStateList(R.color.colorAccent));
+                dot4.setBackgroundTintList(getResources().getColorStateList(R.color.colorAccent));
 
             }
 
