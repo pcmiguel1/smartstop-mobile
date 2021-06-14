@@ -62,8 +62,7 @@ public class VehiclesScreen extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(VehiclesScreen.this);
 
-        SharedPreferences settings = getApplicationContext().getSharedPreferences("smartstop", 0);
-        selectedItem = settings.getInt("vehicleId", 0);
+        selectedItem = MapScreen.vehicleSelectedId;
 
         boxNoVehicles = findViewById(R.id.box_no_vehicles);
         listViewVehicles = findViewById(R.id.listView_vehicles);
@@ -89,13 +88,38 @@ public class VehiclesScreen extends AppCompatActivity {
                 String model = vehicles.get(position).getModel();
                 openEditVehicle(vehicles.get(position).getId(), position, model, registration);
 
-                //Salvar o veiculo selecionado
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putInt("vehicleId", vehicles.get(position).getId());
-                editor.putString("vehicleRegistration", vehicles.get(position).getRegistration());
-                editor.apply();
+                //setar o veiculo selecionado como favorito
+                setFavoriteVehicle(selectedItem);
             }
         });
+
+    }
+
+    private void setFavoriteVehicle(int newId) {
+
+        String url = "http://"+host+":3000/api/vehicles/"+newId+"/favorite/add";
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("oldId", MapScreen.vehicleSelectedId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest request_json = new JsonObjectRequest(Request.Method.PUT, url, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        requestQueue.add(request_json);
 
     }
 

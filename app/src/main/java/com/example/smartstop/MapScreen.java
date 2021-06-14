@@ -140,7 +140,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private MainActivityLocationCallback callback = new MainActivityLocationCallback(this);
 
     private String host = MainActivity.HOST;
-    private int vehicleSelectedId = 0;
+    public static int vehicleSelectedId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,13 +176,51 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
         vehicleRegistration = findViewById(R.id.vehicle_registration);
 
-        //get stored vehicle
-        SharedPreferences settings = getApplicationContext().getSharedPreferences("smartstop", 0);
+        //get favorite vehicle
+        getFavoriteVehicle();
+        /*SharedPreferences settings = getApplicationContext().getSharedPreferences("smartstop", 0);
         vehicleSelectedId = settings.getInt("vehicleId", 0);
         String vehicleR = settings.getString("vehicleRegistration", "");
-        vehicleRegistration.setText(vehicleR);
+        vehicleRegistration.setText(vehicleR);*/
 
         turnOnGPS();
+
+    }
+
+    private void getFavoriteVehicle() {
+
+        String url = null;
+        try {
+            url = "http://"+host+":3000/api/users/"+USER_JSON_OBJECT.getInt("user_id")+"/vehicles/favorite";
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                new com.android.volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        if (response != null) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                vehicleSelectedId = jsonObject.getInt("vehicle_id");
+                                vehicleRegistration.setText(jsonObject.getString("vehicle_registration"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        requestQueue.add(request);
 
     }
 
