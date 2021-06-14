@@ -59,4 +59,10 @@ public class PerfilScreen extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    public void openSettings(View view) {
+        Intent intent = new Intent(PerfilScreen.this, SettingsScreen.class);
+        startActivity(intent);
+        finish();
+    }
 }

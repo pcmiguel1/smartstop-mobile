@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".PaymentsScreen"></activity>
+        <activity android:name=".SettingsScreen"></activity>
+        <activity android:name=".PaymentsScreen" />
         <activity android:name=".BookingHistoryScreen" />
         <activity android:name=".RecoverScreen" />
         <activity android:name=".TokenScreen" />
