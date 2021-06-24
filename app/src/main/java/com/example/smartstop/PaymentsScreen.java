@@ -110,7 +110,6 @@ public class PaymentsScreen extends AppCompatActivity {
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 selectedItem = jsonObject.getInt("payment_method_id");
-                                System.out.println("pila: " + jsonObject);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

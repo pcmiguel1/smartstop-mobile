@@ -8,6 +8,8 @@ import androidx.core.content.res.ResourcesCompat;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -187,6 +189,7 @@ public class BookingHistoryScreen extends AppCompatActivity {
             TextView myTime = row.findViewById(R.id.time_left);
             TextView info = row.findViewById(R.id.info_booking);
             Button extend = row.findViewById(R.id.btn_extend);
+            Button details = row.findViewById(R.id.btn_details);
             LinearLayout btnsBook = row.findViewById(R.id.btns_book);
 
             myMatricula.setText(reservations.get(position).getVehicleRegistration());
@@ -295,6 +298,51 @@ public class BookingHistoryScreen extends AppCompatActivity {
 
                     TimePickerDialog timePickerDialog = new TimePickerDialog(BookingHistoryScreen.this, timeSetListener, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE),true);
                     timePickerDialog.show();
+
+                }
+            });
+
+            details.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    String url = "http://"+host+":3000/api/reservations/"+1;
+
+                    StringRequest request = new StringRequest(Request.Method.GET, url,
+                            new com.android.volley.Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+
+                                    if (response != null) {
+                                        try {
+                                            JSONObject jsonObject = new JSONObject(response);
+
+                                            String dateFrom = jsonObject.getString("reservation_start_day");
+                                            String dateUntil = jsonObject.getString("reservation_last_day");
+
+
+                                            Intent intent = new Intent(BookingHistoryScreen.this, ParkingCodeScreen.class);
+                                            intent.putExtra("DateFrom", dateFrom);
+                                            intent.putExtra("Duration", dateUntil);
+                                            //intent.putExtra("Address", fullAddressFinal);
+                                            startActivity(intent);
+
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+
+                                }
+                            }, new com.android.volley.Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(BookingHistoryScreen.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    requestQueue.add(request);
 
                 }
             });
